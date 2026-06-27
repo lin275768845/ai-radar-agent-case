@@ -5,10 +5,10 @@ preview_urls = false
 
 [vars]
 GITHUB_OWNER = "lin275768845"
-GITHUB_REPO = "ai-radar-agent"
+GITHUB_REPO = "ai-radar-agent-case"
 GITHUB_WORKFLOW = "daily.yml"
 GITHUB_REF = "main"
-BOCHA_ENABLED = "true"
+BOCHA_ENABLED = "false"
 
 [triggers]
 crons = ["0 2 * * *"]

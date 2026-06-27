@@ -4,7 +4,56 @@ Chinese mirror: [README.zh-CN.md](README.zh-CN.md).
 
 ## Public Mirror Note
 
-This is a sanitized public mirror / portfolio version. Production secrets, raw run history, private artifacts, and real Feishu publication history are intentionally excluded. `state/event_history.jsonl` is production runtime state and is not tracked in this mirror; see `state/event_history.sample.jsonl` for fake sample records. Demo artifacts are sanitized and simulated. License not yet specified.
+This repository is a sanitized public mirror of a production AI Radar Agent. It is published for portfolio review, architecture review, workflow review, evidence-first intelligence-agent design review, safety/autonomy boundary review, and case-study review.
+
+It is not a full production clone and is not connected to the live Cloudflare, Feishu, or GitHub production deployment. Production secrets, private configuration, raw production outputs, real Feishu publication history, private runtime state, and production `state/event_history.jsonl` are intentionally excluded. The private production repository remains separate.
+
+For a concise scope summary, see [docs/PUBLIC_MIRROR_SCOPE.md](docs/PUBLIC_MIRROR_SCOPE.md).
+
+## What This Mirror Is
+
+- A sanitized portfolio mirror based on a real production AI intelligence agent.
+- A review target for the agent workflow, architecture, safety boundaries, schema contracts, eval design, and demo artifacts.
+- A case-study repository that shows how an evidence-first publishing agent is structured without exposing production state or credentials.
+
+## What You Can Review
+
+- Evidence-first workflow from recall to Evidence Gate, report generation, Publish Gate, and review artifacts.
+- Autonomy and tool permission boundaries for local work, provider calls, GitHub Actions, Feishu publishing, and external notifications.
+- `RunManifest` and `ToolCall` schema contracts for future runtime observability.
+- No-side-effect eval cases and the local static checker under `evals/`.
+- Sanitized simulated demo artifacts under `demo_run/`.
+- Cloudflare plus GitHub Actions trigger pattern as a reviewable deployment pattern, not a live deployment.
+- Key runtime reconciliation and safety logic, especially report reconciliation, linting, evidence gates, and publish/bot guardrails.
+
+## What You Can Run Locally
+
+These checks are local and require no secrets, no provider keys, and no external side effects:
+
+```bash
+python3 evals/check_ai_radar_week2_eval_cases.py
+python3 -m json.tool demo_run/demo_manifest.json
+python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
+```
+
+This mirror does not promise clone-and-run reproduction of the private production pipeline.
+
+## What Is Intentionally Excluded
+
+- `.env`, `.env.*`, `.dev.vars`, token files, and webhook configuration.
+- Production `state/event_history.jsonl`.
+- Real Feishu document URLs and production publication history.
+- Production outputs, raw run artifacts, private logs, private runtime state, and private operational notes.
+- Cloudflare, GitHub, Feishu, search-provider, and LLM secrets.
+- Private production prompts/configuration that would be required for an end-to-end production run.
+
+## Runability Boundary
+
+This mirror is optimized for reviewable architecture and safety patterns, not turnkey production deployment. End-to-end production execution requires private GitHub repository settings, Cloudflare Worker settings, Feishu app/bot credentials, provider keys, production prompts/configuration, and runtime state that are intentionally not included here.
+
+## License
+
+License not yet specified. This repository is published for portfolio review; reuse rights are not granted unless a license is later added.
 
 ## Project Name
 
@@ -121,40 +170,15 @@ GitHub workflow_dispatch or CLI
 | [docs/case_study_ai_radar_week2.md](docs/case_study_ai_radar_week2.md) | Portfolio case study draft for Week 2 standardization. |
 | [docs/obsidian_pattern_notes/AI_Radar_Week2_MOC.md](docs/obsidian_pattern_notes/AI_Radar_Week2_MOC.md) | Obsidian-ready map of content for sanitized Week 2 pattern notes. |
 
-## Quick Start
-
-Install locally:
-
-```bash
-pip install -e .
-```
-
-Evidence-only debug:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --skip-llm
-```
-
-Local artifact generation without Feishu publish:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --dry-run
-```
-
-No-publish validation mode:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --dry-run --output-mode none
-```
-
-Week 2 static checks:
+## Local Static Checks
 
 ```bash
 python3 evals/check_ai_radar_week2_eval_cases.py
 python3 -m json.tool demo_run/demo_manifest.json
+python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
 ```
 
-Production is normally triggered by Feishu automation calling GitHub Actions `workflow_dispatch` for `.github/workflows/daily.yml`. Current production dispatchers should use `main` together with `EVENT_HISTORY_COMMIT_REF=main`; old dispatchers that still point at `single_card_v7.1` are rollback/manual-only until explicitly switched.
+Full production execution is intentionally out of scope for this public mirror.
 
 ## Environment Variables
 
@@ -231,19 +255,12 @@ Use variable names only in docs and code examples. Do not store real values in t
 .
 ├── ai_radar_agent/          # Python package and runtime logic
 ├── ai_radar_agent/fetchers/ # RSS, Bocha, Tavily fetchers
-├── config/                  # recall source configuration
 ├── docs/                    # architecture and operations docs
 ├── schemas/                 # RunManifest / ToolCall schema contracts; runtime emission planned
-├── prompts/                 # main radar prompt plus scaffold prompt slots
-├── skills/                  # scaffold skill slot, not loaded by runtime
 ├── evals/                   # Week 2 static eval definitions and checker; runtime integration planned
-├── runs/                    # scaffold run-log directory; do not commit real runs
-├── state/                   # event history state plus scaffold marker
+├── state/                   # sample event-history shape only; production state excluded
 ├── tests/                   # pytest suite
-├── outputs/                 # local run artifacts, ignored by git
 ├── .github/workflows/       # GitHub Actions workflow
-├── Dockerfile
-├── docker-compose.yml
 ├── pyproject.toml
 └── README.md
 ```
@@ -252,15 +269,11 @@ Use variable names only in docs and code examples. Do not store real values in t
 
 - `ai_radar_agent/`: production Python package.
 - `schemas/`: Week 2 `RunManifest` and `ToolCall` schema contracts; current runtime validation still lives in Python code and tests.
-- `prompts/`: main DeepSeek radar prompt source plus scaffold prompt migration slots.
-- `skills/`: standard scaffold skill slot; current runtime does not load skill files.
 - `evals/`: Week 2 no-side-effect eval definitions and static checker; current CI/runtime does not execute runtime eval integration.
-- `runs/`: standard scaffold directory; do not commit real run logs.
-- `state/`: event history state plus scaffold marker; do not store secrets or private logs.
-- `config/`: RSS and search basket configuration.
+- `state/`: sanitized sample event-history shape. Production `state/event_history.jsonl` is excluded.
 - `tests/`: regression tests for workflow, parsing, gates, Feishu, and bot behavior.
 - `docs/`: recovered project design documents.
-- `outputs/`: local artifacts and publish state; do not commit real run outputs.
+- `demo_run/`: sanitized simulated demo artifacts.
 
 ## Non-goals
 
@@ -269,6 +282,7 @@ Use variable names only in docs and code examples. Do not store real values in t
 - Not a job-search or career-advice agent.
 - Not a system that asks the LLM to browse or invent URLs.
 - Not a fully autonomous irreversible publisher; high-risk production changes require confirmation.
+- Not a full production clone or turnkey deployment repository.
 
 ## Maintenance Notes
 
