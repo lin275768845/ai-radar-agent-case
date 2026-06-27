@@ -1,54 +1,62 @@
 # Cloudflare AI Radar Trigger Pattern
 
-This directory is included in the public mirror to show the Cloudflare Worker trigger pattern used by AI Radar-style deployments. It is documentation and review material for the sanitized portfolio mirror, not evidence that this public repository is connected to a live Cloudflare, Feishu, or GitHub production deployment.
+This directory is included to show the Cloudflare Worker trigger pattern used
+by AI Radar-style deployments.
 
-Default mirror schedule in `wrangler.toml`:
-
-```text
-0 2 * * *
-```
-
-Cloudflare cron uses UTC, so this is 10:00 Asia/Shanghai.
+It is public review material for the sanitized portfolio mirror. It is not the
+live production Worker config, and this public repository is not connected to a
+live Cloudflare, Feishu, provider, or GitHub production deployment.
 
 ## Mirror-Safe Defaults
 
-The committed `wrangler.toml` uses mirror-safe defaults:
+The committed `wrangler.toml` uses public-mirror defaults:
 
 - `GITHUB_REPO = "ai-radar-agent-case"`
 - `GITHUB_REF = "main"`
 - `BOCHA_ENABLED = "false"`
 
-Production deployments should override these values through private Cloudflare environment variables or private deployment configuration outside this public repository.
+These values are safe for public review. Private production deployments should
+override runtime settings through private Cloudflare environment variables or
+private deployment configuration outside this repository.
 
-## Required Variables For A Private Deployment
+Do not commit real account IDs, tokens, webhook URLs, bearer secrets, provider
+keys, or Feishu/GitHub/Cloudflare secrets.
 
-Configure these in Cloudflare Worker settings:
+## Schedule Example
 
-- `GITHUB_OWNER`: defaults to `lin275768845`
-- `GITHUB_REPO`: defaults to `ai-radar-agent-case` in this public mirror
-- `GITHUB_WORKFLOW`: defaults to `daily.yml`
-- `GITHUB_REF`: defaults to `main`
+The mirror schedule in `wrangler.toml` is:
 
-When `GITHUB_REF=main`, also set the GitHub repository variable
-`EVENT_HISTORY_COMMIT_REF=main` so the workflow can write
-`state/event_history.jsonl` back to the same ref.
+```text
+0 2 * * *
+```
 
-Optional control variables. The workflow input `bocha_enabled` is always sent explicitly:
+Cloudflare cron uses UTC, so this corresponds to 10:00 Asia/Shanghai.
 
-- `BOCHA_ENABLED`: set to `false` in the committed mirror config. A private production deployment may override it outside the repository if Bocha should be enabled.
+This schedule is included as a pattern example. It does not mean this public
+mirror is deployed or connected to production.
 
-Configure these as secrets:
+## Private Deployment Variables
 
-- `GITHUB_TOKEN`: GitHub fine-grained token with Actions read/write for the repository.
-- `MANUAL_TRIGGER_SECRET`: long random secret for manual `/trigger` calls.
+A private deployment would configure these outside the public repo:
 
-Do not commit real tokens or secrets to this repository.
-Keep `BOCHA_API_KEY` in GitHub Actions secrets only; do not store or print it in Worker docs or logs.
+- `GITHUB_OWNER`
+- `GITHUB_REPO`
+- `GITHUB_WORKFLOW`
+- `GITHUB_REF`
+- `BOCHA_ENABLED`
+
+Secrets must also be configured outside the public repo:
+
+- `GITHUB_TOKEN`
+- `MANUAL_TRIGGER_SECRET`
+- Provider API keys
+- Feishu app or bot secrets
+
 Manual `/trigger` bearer secrets are not included in this mirror.
 
-## Manual Trigger
+## Manual Trigger Pattern
 
-Use an Authorization header, not a query parameter:
+The Worker expects an Authorization header, not a query parameter:
 
 ```bash
 curl -X GET \
@@ -56,12 +64,16 @@ curl -X GET \
   https://<worker-name>.<account>.workers.dev/trigger
 ```
 
-The Worker returns `202` quickly and dispatches GitHub in the background. In this public mirror, treat this as a pattern to review. A real deployment requires private Cloudflare, GitHub, Feishu, and provider secrets configured outside the repo.
+Treat this as an interface pattern only. A real deployment requires private
+Cloudflare, GitHub, Feishu, and provider secrets configured outside this public
+repository.
 
-## Notes
+## Review Notes
 
-- GitHub API 429 / 5xx responses are retried up to three times.
-- Logs include GitHub status and a short sanitized response body.
-- Logs never print `GITHUB_TOKEN` or `MANUAL_TRIGGER_SECRET`.
-- Bocha is controlled by the explicit `bocha_enabled` workflow input. Do not rely on GitHub repo variable `BOCHA_ENABLED` for manual or Cloudflare-triggered runs.
-- This public mirror contains the Worker pattern only. Production deployment requires private Cloudflare, GitHub, Feishu, and provider environment variables/secrets configured outside the repository.
+- The Worker dispatches GitHub Actions in the background.
+- GitHub API 429 and 5xx responses are retried up to three times.
+- Logs are intended to include status and short sanitized response summaries.
+- Logs must not print `GITHUB_TOKEN` or `MANUAL_TRIGGER_SECRET`.
+- Bocha is controlled by the explicit `bocha_enabled` workflow input.
+- This public mirror contains the Worker pattern only, not the production
+  Worker deployment state.

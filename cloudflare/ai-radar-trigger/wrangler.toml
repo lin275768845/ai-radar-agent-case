@@ -3,6 +3,8 @@ main = "src/index.js"
 compatibility_date = "2026-06-05"
 preview_urls = false
 
+# Public mirror pattern config only.
+# Private production deployments must override settings outside this repo.
 [vars]
 GITHUB_OWNER = "lin275768845"
 GITHUB_REPO = "ai-radar-agent-case"

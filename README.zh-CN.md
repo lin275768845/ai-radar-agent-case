@@ -1,28 +1,62 @@
 # AI Radar Agent
 
-这是 AI Radar Agent 的中文 README。英文主版本见 [README.md](README.md)，中文术语说明见 [docs/zh-CN/GLOSSARY.md](docs/zh-CN/GLOSSARY.md)。
+英文主版本见 [README.md](README.md)。
 
-AI Radar Agent 是一个证据优先的情报与发布代理案例。它展示了如何把分散的 AI 行业信号转化为带来源约束的每日雷达报告工作流，并用明确的自治边界、发布门禁、运行级契约、本地评估和脱敏演示产物来约束代理行为。
+中文术语说明见 [docs/zh-CN/GLOSSARY.md](docs/zh-CN/GLOSSARY.md)。
 
-本仓库是生产版 AI Radar Agent 的脱敏公开作品集镜像。它主要用于架构审阅、安全边界审阅、工作流方法论展示、eval/schema/demo 审阅和案例研究。它不是完整生产 clone，不包含生产 secrets、私有配置、真实 Feishu 发布历史、生产 `state/event_history.jsonl`、真实 outputs 或私有运行状态，也不连接真实 Cloudflare / Feishu / GitHub 生产部署。私有生产仓库仍然独立保留。
+## 公开案例镜像
 
-更多范围说明见 [docs/zh-CN/PUBLIC_MIRROR_SCOPE.md](docs/zh-CN/PUBLIC_MIRROR_SCOPE.md)。
+本仓库是生产版 AI Radar Agent 的脱敏公开作品集镜像。
+
+它主要用于：
+
+- 架构审阅。
+- 工作流审阅。
+- evidence-first intelligence agent 设计审阅。
+- 安全与自治边界审阅。
+- eval、schema、demo 审阅。
+- 案例研究和作品集展示。
+
+它不是完整生产 clone，也不连接真实 Cloudflare、Feishu 或 GitHub
+生产部署。私有生产仓库仍然独立保留。
+
+生产 secrets、私有配置、真实生产 outputs、真实 Feishu 发布历史、
+私有 runtime state，以及生产 `state/event_history.jsonl` 都被有意排除。
+
+更多范围说明见
+[docs/zh-CN/PUBLIC_MIRROR_SCOPE.md](docs/zh-CN/PUBLIC_MIRROR_SCOPE.md)。
 
 ## 这个镜像是什么
 
 - 基于真实生产 agent 的脱敏作品集镜像。
-- 用于审阅 agent workflow、architecture、safety boundaries、schema contracts、eval design 和 demo artifacts。
-- 通过可审阅的公开材料展示 evidence-first publishing agent 的结构，同时不暴露生产 state 或 credentials。
+- 用于展示 evidence-first intelligence agent 的架构与方法论。
+- 用于审阅 workflow、gates、autonomy boundaries、schema contracts、
+  evals、demo artifacts 和 public safety posture。
+- 展示系统结构，但不暴露 credentials、private runtime state 或生产发布历史。
+
+## 这个镜像不是什么
+
+- 不是 turnkey deployment repo。
+- 不是私有生产仓库的完整 clone。
+- 不连接真实 Cloudflare、Feishu、provider 或 GitHub 生产配置。
+- 不承诺 clone 后即可端到端复现私有生产流水线。
+- 不存放生产 secrets、raw outputs、webhook configs 或 private
+  operational notes。
 
 ## 你可以审阅什么
 
-- 从 source recall 到 Evidence Gate、report generation、Publish Gate 和 review artifacts 的 evidence-first workflow。
-- 本地工作、provider calls、GitHub Actions、Feishu publishing 和 external notifications 的自治与工具权限边界。
+- 从 public-source recall 到 Evidence Gate、report generation、
+  report linting、Publish Gate 和 review artifacts 的 evidence-first
+  workflow。
+- 本地工作、provider calls、GitHub Actions、Feishu publishing 和
+  external notifications 的安全与自治边界。
 - 面向未来运行时可观测性的 `RunManifest` 与 `ToolCall` schema contracts。
-- `evals/` 下无外部副作用的 eval cases 和本地静态 checker。
-- `demo_run/` 下脱敏的模拟 demo artifacts。
-- Cloudflare + GitHub Actions trigger pattern。它是可审阅的部署模式，不是 live deployment。
-- 关键 runtime reconciliation 与 safety logic，特别是 report reconcile、lint、evidence gates 和 publish/bot guardrails。
+- `evals/` 下无外部副作用的 eval definitions 和本地静态 checker。
+- `demo_run/` 下脱敏、模拟的 demo artifacts。
+- Cloudflare + GitHub Actions trigger pattern。它是可审阅的部署模式，
+  不是 live deployment。
+- 关键 runtime reconciliation 与 safety logic，特别是 report
+  reconciliation、lint、evidence gates 和 publish/bot guardrails。
 
 ## 你可以在本地运行什么
 
@@ -34,145 +68,174 @@ python3 -m json.tool demo_run/demo_manifest.json
 python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
 ```
 
-这个 mirror 不承诺 clone 后即可复现私有生产流水线。
+完整私有生产流水线不属于这个 public mirror 的可运行范围。
 
 ## 哪些内容被有意排除
 
-- `.env`, `.env.*`, `.dev.vars`, token files 和 webhook configs。
+- `.env`、`.env.*`、`.dev.vars`、token files、webhook configs 和 secrets。
 - 生产 `state/event_history.jsonl`。
-- 真实 Feishu 文档 URL 与发布历史。
-- 生产 outputs、raw artifacts、private logs、private runtime state 和 private operational notes。
+- 真实 Feishu 文档 URL 与生产发布历史。
+- 生产 outputs、raw run artifacts、private logs、private runtime state 和
+  private operational notes。
 - Cloudflare、GitHub、Feishu、search provider 和 LLM secrets。
-- 端到端生产执行所需的私有 prompts/configuration。
+- 私有生产 source configuration。
+- 私有生产 prompts。
+- 私有部署配置和账号级设置。
+
+在私有生产仓库中，source configuration 和 report prompts 会放在类似
+`config/sources.yaml` 与 `prompts/radar_prompt.md` 的文件中。
+这些文件被有意排除在公开镜像之外。
 
 ## 可运行性边界
 
-这个 mirror 面向可审阅的架构与安全模式，不是 turnkey production deployment repo。真实生产执行需要私有 GitHub repository settings、Cloudflare Worker settings、Feishu app/bot credentials、provider keys、production prompts/configuration 和 runtime state，这些内容都不包含在公开仓库中。
+这个 mirror 面向可审阅的架构与安全模式，不是 clone-and-run 的生产部署仓库。
 
-## License / 使用限制
+真实生产执行需要私有 GitHub repository settings、Cloudflare Worker
+settings、Feishu app/bot credentials、provider keys、production
+prompts/configuration、production state 和 deployment controls。
+这些内容都不包含在公开仓库中。
 
-License not yet specified。本仓库用于作品集审阅；除非后续添加 license，否则不授予复用权利。
+## 项目概览
 
-## 本项目展示什么
+AI Radar Agent 是一个证据优先的情报与发布代理。它收集公开 AI 行业信号，
+通过 evidence 和 quality gates 过滤，再生成带来源约束的每日雷达报告。
+只有在人工控制的发布门禁允许时，生产环境才会进入发布路径。
 
-- 展示从来源召回到门禁后输出的代理工作流设计。
-- 证据优先的报告生成：先绑定来源，再写叙事。
-- 明确本地工作、provider 访问、workflow dispatch 和发布动作的自治与权限边界。
-- 基于门禁的发布安全模型，覆盖 Feishu、bot 卡片、workflow dispatch 和不发布模式。
-- 面向未来运行级可观测性的 RunManifest 与 ToolCall schema 契约。
-- 无外部副作用的评估套件与静态校验。
-- 脱敏演示运行（sanitized demo run）：展示产物形态，但不进行网络调用或生产执行。
+这个公开镜像重点展示 agent design：
 
-## 实现状态
+- Recall before generation。
+- Evidence before narrative。
+- Schema contracts before runtime observability。
+- Gates before publish。
+- Local evals before broader automation。
+- Redacted artifacts before public storytelling。
 
-| 领域 | 状态 | 说明 |
+## 当前状态
+
+| 领域 | 公开镜像状态 | 说明 |
 | --- | --- | --- |
-| Phase A 核心文档 | 已实现（implemented） | 工作流、自治边界、工具权限、门禁、评估计划、可观测性和运行手册已文档化。 |
-| Phase B schema 契约 | 已实现（implemented） | `RunManifest` 与 `ToolCall` schema 契约已存在于 `schemas/`。 |
-| RunManifest / ToolCall 的运行时产出 | 计划中（planned） | 当前运行产物仍然分散；正式的 manifest 与 tool-call 产出仍是后续工作。 |
-| Phase C 评估用例定义 | 已实现（implemented） | 10 个无外部副作用评估用例已用 JSONL 定义。 |
-| Phase C 静态检查器 | 已实现（implemented） | 本地静态检查器校验 Week 2 评估文件与 Phase B schema JSON。 |
-| 运行时评估集成 | 计划中（planned） | 静态检查器只校验定义，不校验真实运行时行为。 |
-| Phase D 脱敏演示运行（sanitized demo run） | 已实现（implemented） | 演示产物使用确定性的模拟数据，并明确标记为模拟。 |
-| Week 2 标准化过程中的外部发布 / Feishu / GitHub workflow dispatch | 未触发（not triggered） | Week 2 的文档、评估和演示流程没有触发任何外部发布、Feishu、webhook 或 GitHub workflow dispatch。 |
-| Dashboard / 精修截图 | 计划中（planned，P2 / Week 7 Portfolio） | Week 2 Phase E 不创建 dashboard 或截图产物。 |
-| Phase F Obsidian-ready 模式笔记 | 已实现（implemented） | 仓库内的导出笔记位于 `docs/obsidian_pattern_notes/`；未导入任何 vault。 |
+| 核心工作流文档 | 已实现 | Workflow、autonomy、tools、gates、eval plan、observability 和 runbook 已文档化。 |
+| `RunManifest` / `ToolCall` schemas | 已实现 | Contracts 位于 `schemas/`；runtime emission 仍是 planned。 |
+| 静态 eval definitions | 已实现 | 10 个 no-side-effect eval cases 用 JSONL 定义。 |
+| 静态 eval checker | 已实现 | 本地 checker 校验 eval definitions 和 schema JSON。 |
+| Runtime eval integration | 计划中 | Checker 校验定义，不校验真实 runtime behavior。 |
+| Sanitized demo run | 已实现 | Demo artifacts 使用确定性 mock data，并明确标记为 simulated。 |
+| 中文文档 | 已实现 | 中文镜像文档位于 `README.zh-CN.md` 和 `docs/zh-CN/`。 |
+| External publish | 私有且人工门禁 | 真实发布控制属于私有生产环境。 |
+| Dashboard/screenshots | 计划中 | 不属于本次 mirror polish。 |
 
-## 架构概览
+## 工作流草图
 
 ```text
-公开来源
-  -> 证据采集
-  -> 证据门禁（Evidence Gate）
-  -> 情报草稿
-  -> 报告 / 简报 / 头条事件审核
-  -> 发布门禁（Publish Gate）
-  -> 本地产物 / 未来可选发布
+Trigger pattern or local operator
+  -> Beijing natural-day window
+  -> public-source recall
+  -> Evidence Gate and event-history checks
+  -> filtered evidence artifacts
+  -> report generation path
+  -> report lint and brief validation
+  -> final top-event reconciliation
+  -> Publish Gate
+  -> local artifacts or private production publish path
 ```
 
-当前 Week 2 产物聚焦代理的控制面：工作流文档、门禁、契约、静态评估和脱敏本地演示。外部发布仍然需要明确的人工确认，演示不会执行发布。
+公开镜像包含让这个 workflow 可审阅的代码、文档、schemas、evals 和脱敏
+demo artifacts。它不包含端到端运行生产路径所需的私有配置。
 
 ## 产物地图
 
 | 产物 | 用途 |
 | --- | --- |
-| [docs/03_WORKFLOW.md](docs/03_WORKFLOW.md) | 英文权威工作流文档。 |
-| [docs/zh-CN/03_WORKFLOW.md](docs/zh-CN/03_WORKFLOW.md) | 中文工作流镜像。 |
-| [docs/04_AUTONOMY_MATRIX.md](docs/04_AUTONOMY_MATRIX.md) | 英文权威自治边界文档。 |
-| [docs/zh-CN/04_AUTONOMY_MATRIX.md](docs/zh-CN/04_AUTONOMY_MATRIX.md) | 中文自治边界镜像。 |
-| [docs/06_TOOLS_AND_PERMISSIONS.md](docs/06_TOOLS_AND_PERMISSIONS.md) | 英文权威工具权限矩阵。 |
-| [docs/zh-CN/06_TOOLS_AND_PERMISSIONS.md](docs/zh-CN/06_TOOLS_AND_PERMISSIONS.md) | 中文工具权限镜像。 |
-| [docs/09_GATES_AND_GUARDRAILS.md](docs/09_GATES_AND_GUARDRAILS.md) | 英文权威门禁与护栏文档。 |
-| [docs/zh-CN/09_GATES_AND_GUARDRAILS.md](docs/zh-CN/09_GATES_AND_GUARDRAILS.md) | 中文门禁镜像。 |
-| [docs/10_EVAL_PLAN.md](docs/10_EVAL_PLAN.md) | 英文权威评估计划。 |
-| [docs/zh-CN/10_EVAL_PLAN.md](docs/zh-CN/10_EVAL_PLAN.md) | 中文评估计划镜像。 |
-| [docs/11_OBSERVABILITY.md](docs/11_OBSERVABILITY.md) | 英文权威可观测性文档。 |
-| [docs/zh-CN/11_OBSERVABILITY.md](docs/zh-CN/11_OBSERVABILITY.md) | 中文可观测性镜像。 |
-| [docs/12_RUNBOOK.md](docs/12_RUNBOOK.md) | 英文权威运行手册。 |
-| [docs/zh-CN/12_RUNBOOK.md](docs/zh-CN/12_RUNBOOK.md) | 中文运行手册镜像。 |
-| [docs/13_RUNTIME_OBJECT_MAP.md](docs/13_RUNTIME_OBJECT_MAP.md) | 英文权威运行时对象地图。 |
-| [docs/zh-CN/13_RUNTIME_OBJECT_MAP.md](docs/zh-CN/13_RUNTIME_OBJECT_MAP.md) | 中文运行时对象地图镜像。 |
-| [schemas/run_manifest.schema.json](schemas/run_manifest.schema.json) | 运行级 schema 契约；字段名不翻译。 |
-| [schemas/tool_call.schema.json](schemas/tool_call.schema.json) | 单次工具调用 schema 契约；字段名不翻译。 |
-| [evals/ai_radar_week2_eval_cases.jsonl](evals/ai_radar_week2_eval_cases.jsonl) | 10 个本地无外部副作用评估用例定义。 |
-| [evals/check_ai_radar_week2_eval_cases.py](evals/check_ai_radar_week2_eval_cases.py) | 本地静态检查器。 |
-| [demo_run/demo_output_report.md](demo_run/demo_output_report.md) | 脱敏的模拟演示报告。 |
-| [docs/case_study_ai_radar_week2.md](docs/case_study_ai_radar_week2.md) | 英文权威案例研究。 |
-| [docs/zh-CN/case_study_ai_radar_week2.md](docs/zh-CN/case_study_ai_radar_week2.md) | 中文案例研究镜像。 |
-| [docs/obsidian_pattern_notes/AI_Radar_Week2_MOC.md](docs/obsidian_pattern_notes/AI_Radar_Week2_MOC.md) | 英文权威 Obsidian-ready 内容地图。 |
-| [docs/obsidian_pattern_notes/zh-CN/AI_Radar_Week2_MOC.md](docs/obsidian_pattern_notes/zh-CN/AI_Radar_Week2_MOC.md) | 中文 Obsidian-ready 内容地图镜像。 |
+| [docs/zh-CN/PUBLIC_MIRROR_SCOPE.md](docs/zh-CN/PUBLIC_MIRROR_SCOPE.md) | 公开镜像范围与可运行性边界。 |
+| [docs/03_WORKFLOW.md](docs/03_WORKFLOW.md) | 从 recall 到 artifacts 和 publish gate 的工作流。 |
+| [docs/04_AUTONOMY_MATRIX.md](docs/04_AUTONOMY_MATRIX.md) | 自治边界和人工批准点。 |
+| [docs/06_TOOLS_AND_PERMISSIONS.md](docs/06_TOOLS_AND_PERMISSIONS.md) | 工具权限矩阵和 side-effect classes。 |
+| [docs/09_GATES_AND_GUARDRAILS.md](docs/09_GATES_AND_GUARDRAILS.md) | Evidence、report、brief、publish、privacy 和 manifest gates。 |
+| [docs/10_EVAL_PLAN.md](docs/10_EVAL_PLAN.md) | Eval strategy 和 static checker status。 |
+| [docs/11_OBSERVABILITY.md](docs/11_OBSERVABILITY.md) | 当前 artifacts、observability gaps 和 manifest direction。 |
+| [docs/12_RUNBOOK.md](docs/12_RUNBOOK.md) | Safe local modes、common failures 和 emergency stop guidance。 |
+| [docs/13_RUNTIME_OBJECT_MAP.md](docs/13_RUNTIME_OBJECT_MAP.md) | Manifests、tool calls、gates、evals 和 demos 的关系。 |
+| [schemas/run_manifest.schema.json](schemas/run_manifest.schema.json) | Run-level schema contract。 |
+| [schemas/tool_call.schema.json](schemas/tool_call.schema.json) | Per-tool-call schema contract。 |
+| [evals/ai_radar_week2_eval_cases.jsonl](evals/ai_radar_week2_eval_cases.jsonl) | No-side-effect eval case definitions。 |
+| [evals/check_ai_radar_week2_eval_cases.py](evals/check_ai_radar_week2_eval_cases.py) | 本地静态 checker。 |
+| [demo_run/demo_output_report.md](demo_run/demo_output_report.md) | 脱敏模拟 demo report。 |
+| [docs/case_study_ai_radar_week2.md](docs/case_study_ai_radar_week2.md) | Public case-study draft。 |
+
+## 公开仓库结构
+
+```text
+.
+├── ai_radar_agent/          # 供审阅的 Python package 和 runtime logic
+├── ai_radar_agent/fetchers/ # RSS、Bocha、Tavily fetcher modules
+├── cloudflare/              # Mirror-safe Worker trigger pattern
+├── demo_run/                # 脱敏模拟 demo artifacts
+├── docs/                    # Architecture、workflow、operations docs
+├── evals/                   # Static no-side-effect eval cases and checker
+├── schemas/                 # RunManifest / ToolCall schema contracts
+├── state/                   # 仅 sample event-history shape
+├── tests/                   # Regression tests
+├── .github/workflows/       # Manual workflow pattern
+├── pyproject.toml
+└── README.md
+```
+
+## Demo Artifacts
+
+`demo_run/` 目录包含 deterministic、sanitized、simulated artifacts。
+它们用于展示 artifact shape 和 safety posture，不使用生产数据。
+
+包含的 demo artifacts：
+
+- `demo_manifest.json`
+- `demo_tool_calls.jsonl`
+- `demo_evidence_items.jsonl`
+- `demo_output_report.md`
+
+这些不是实时市场情报，也不应被描述为 production outputs。
+
+## Cloudflare 与 GitHub Actions Pattern
+
+镜像包含 `cloudflare/ai-radar-trigger/` 下的 Cloudflare Worker trigger
+pattern，以及 `.github/workflows/` 下的 manual GitHub Actions workflow
+pattern。
+
+这些文件用于 architecture 和 safety review。它们不表示这个公开仓库已经部署
+到 Cloudflare，也不表示它连接了真实 Feishu/provider credentials。
+
+提交到公开镜像里的默认值是安全的：
+
+- `GITHUB_REPO = "ai-radar-agent-case"`
+- `GITHUB_REF = "main"`
+- `BOCHA_ENABLED = "false"`
+
+私有生产部署必须在公开仓库之外覆盖 deployment settings 和 secrets。
 
 ## 安全姿态
 
-- 文档、评估、演示产物、提交和报告中都不应包含 secrets。
-- Week 2 不执行外部发布。
-- Week 2 不触发 Feishu、webhook、GitHub workflow dispatch 或 provider 写入。
-- 演示运行是模拟运行，使用确定性的模拟数据。
-- 评估检查器只做本地静态检查：不导入生产代码，不调用外部 API，不调用 LLM，也不运行生产流水线。
-- 演示产物不是生产输出，也不应被描述为实时市场情报。
+- 不提交 `.env`、secrets、tokens、cookies、webhooks、private logs 或
+  real credentials。
+- 不把真实 Feishu、GitHub、DeepSeek、Bocha、Tavily、Cloudflare 或
+  provider secrets 粘贴进 issues、docs、prompts、logs 或 chat。
+- 生产 `outputs/` 和生产 `state/event_history.jsonl` 应视为 private
+  operational artifacts。
+- Logs 和 summaries 应保持 redacted，不输出 full prompts、full evidence
+  payloads、LLM payloads、HTTP headers、secrets 或 webhook URLs。
+- External publishing、workflow dispatch、Feishu bot sends 和 deployment
+  changes 仍然是 human-owned production actions。
 
-## 安全的本地检查
+## 维护说明
 
-这些命令仅在本地运行，没有外部副作用（external_side_effects）：
+- 公开 README 应聚焦 architecture、workflow、safety、evals、schemas 和
+  sanitized demos。
+- 私有 production runbooks、prompts、source configs 和 state 应留在公开
+  mirror 之外。
+- 更新文档时，应保持 implemented、partial、planned、simulated 和
+  private-production-only 的区别。
+- 更新 Cloudflare 示例时，应保持 mirror-safe defaults，不加入真实 account
+  IDs、tokens、worker URLs、webhook URLs 或 secrets。
 
-```bash
-python3 evals/check_ai_radar_week2_eval_cases.py
-python3 -m json.tool demo_run/demo_manifest.json
-python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
-```
+## License / 使用限制
 
-可选 JSONL parse check：
-
-```bash
-python3 - <<'PY'
-import json
-from pathlib import Path
-
-for path in [
-    Path("demo_run/demo_tool_calls.jsonl"),
-    Path("demo_run/demo_evidence_items.jsonl"),
-    Path("evals/ai_radar_week2_eval_cases.jsonl"),
-]:
-    count = 0
-    for line in path.read_text(encoding="utf-8").splitlines():
-        if line.strip():
-            json.loads(line)
-            count += 1
-    print(f"{path}: {count} valid records")
-PY
-```
-
-## 路线图
-
-- Phase F: Obsidian-ready pattern notes 已作为 repo-local export notes 实现；不会自动安装到任何 vault。
-- Future 运行时集成: 从真实 runs 中 emit RunManifest 与 ToolCall records。
-- 未来评估集成：在没有外部副作用（external_side_effects）的前提下校验已产出的 manifests 和选定运行输出。
-- Week 7 Portfolio: 可选 read-only dashboard 与 polished screenshots，基于 sanitized artifacts。
-- 只有在明确批准后才进行可选 PR 或 review。
-
-## 非目标
-
-- 本分支不声明已经生产部署。
-- 脱敏演示不是实时数据。
-- 评估检查器不是生产流水线。
-- README 不授权发布、workflow dispatch、Feishu 消息或 webhook 调用。
+License not yet specified。本仓库用于作品集审阅；除非后续添加 license，
+否则不授予复用权利。

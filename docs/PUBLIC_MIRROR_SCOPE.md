@@ -1,19 +1,28 @@
 # Public Mirror Scope
 
-This repository is a sanitized public mirror of a private production AI Radar Agent. It is intended for portfolio and case-study review, not for reproducing the private production deployment end to end.
+This repository is a sanitized public mirror of a private production AI Radar
+Agent.
+
+It is intended for portfolio and case-study review. It is not intended to
+reproduce the private production deployment end to end.
 
 ## Purpose
 
 - Review the evidence-first intelligence-agent architecture.
-- Review workflow design, autonomy boundaries, gates, schemas, evals, and sanitized demo artifacts.
-- Show the Cloudflare plus GitHub Actions trigger pattern without exposing live deployment state.
+- Review workflow design, autonomy boundaries, gates, schemas, evals, and
+  sanitized demo artifacts.
+- Show the Cloudflare plus GitHub Actions trigger pattern without exposing live
+  deployment state.
+- Make the public safety posture inspectable without publishing private runtime
+  data.
 
 ## Included
 
 - Core Python package modules needed to understand the runtime design.
-- Architecture, workflow, gate, runbook, observability, and case-study documentation.
+- Architecture, workflow, gate, runbook, observability, and case-study
+  documentation.
 - `RunManifest` and `ToolCall` schema contracts.
-- No-side-effect eval definitions and static checker.
+- No-side-effect eval definitions and the static checker.
 - Sanitized simulated demo artifacts.
 - Mirror-safe Cloudflare Worker pattern files.
 
@@ -22,8 +31,24 @@ This repository is a sanitized public mirror of a private production AI Radar Ag
 - `.env`, `.env.*`, `.dev.vars`, tokens, webhook configs, and secrets.
 - Production `state/event_history.jsonl`.
 - Real Feishu document URLs and publication history.
-- Production outputs, raw run artifacts, private logs, private runtime state, and private operational notes.
-- Private production prompts/configuration required for end-to-end production execution.
+- Production outputs, raw run artifacts, private logs, private runtime state,
+  and private operational notes.
+- Private production prompts and source configuration.
+- Private Cloudflare, GitHub, Feishu, provider, and account settings.
+
+In the private production repo, source configuration and report prompts are
+kept in files such as `config/sources.yaml` and `prompts/radar_prompt.md`.
+Those files are intentionally excluded from this public mirror.
+
+## What Can Be Reviewed
+
+- Evidence Gate and Publish Gate design.
+- Autonomy and tool-permission boundaries.
+- Redaction and no-side-effect posture.
+- Runtime schema direction.
+- Static eval methodology.
+- Sanitized demo artifact shape.
+- Cloudflare/GitHub trigger pattern as architecture, not live deployment.
 
 ## Local Checks
 
@@ -35,4 +60,15 @@ python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_recon
 
 ## Runability Boundary
 
-This mirror is optimized for architecture and safety review. A real production deployment requires private GitHub settings, Cloudflare settings, Feishu app/bot credentials, provider keys, production prompts/configuration, and runtime state outside this public repository.
+This mirror is optimized for architecture and safety review.
+
+A real production deployment requires private GitHub settings, Cloudflare
+settings, Feishu app/bot credentials, provider keys, production
+prompts/configuration, and runtime state outside this public repository.
+
+## Public Safety Posture
+
+- The checked-in demo is simulated and sanitized.
+- The checked-in evals are local and no-side-effect.
+- The checked-in Cloudflare config is mirror-safe by default.
+- Production secrets, raw outputs, webhook configs, and state are not included.
