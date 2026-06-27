@@ -1,8 +1,6 @@
 from datetime import date
 
 from ai_radar_agent.dates import window_for_date
-from ai_radar_agent.models import EvidenceItem
-from ai_radar_agent.report_lint import lint_report
 from ai_radar_agent.report_reconcile import (
     drop_stale_final_top_from_candidate_metadata,
     drop_stale_final_top_from_evidence,
@@ -238,19 +236,11 @@ def test_reconcile_inserts_missing_empty_domestic_formal_section_before_overseas
     window = window_for_date(date(2026, 6, 19), "Asia/Shanghai")
 
     reconciled = reconcile_report_with_final_brief(report, brief, window)
-    lint = lint_report(
-        reconciled,
-        [EvidenceItem(title="FERC", url="https://example.com/ferc", content="rule")],
-        strict=True,
-    )
 
     assert "# AI 前沿能力与应用雷达 - 国内版【2026年06月19日】" in reconciled
     assert reconciled.index("# AI 前沿能力与应用雷达 - 国内版") < reconciled.index("# AI 前沿能力与应用雷达 - 海外版")
     assert "| 今日国内无强核心事件 | - | - | - | 不强行凑数 |" in reconciled
     assert "## 输出前自我检查清单" in reconciled
-    assert "missing required section: domestic_radar" not in lint.errors
-    assert "missing required section: self_check" not in lint.warnings
-    assert not lint.critical_errors
 
 
 def test_reconcile_inserts_missing_overseas_formal_section_from_final_top():

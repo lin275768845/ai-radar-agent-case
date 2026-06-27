@@ -5,7 +5,8 @@
 - Status: active
 - Last Updated: 2026-06-19
 - Source of Truth: repository code, `README.md`, `AGENTS.md`, `.github/workflows/daily.yml`
-- Related Files: `ai_radar_agent/__main__.py`, `collector.py`, `llm.py`, `report_lint.py`, `brief.py`, `feishu_docx.py`, `feishu_bot.py`
+- Related Files: selected public code slices, schemas, evals, demo artifacts;
+  full production runtime files are omitted from this curated mirror.
 
 ## Autonomy Principle
 

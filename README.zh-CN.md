@@ -42,6 +42,8 @@ Actions 生产运行配置。私有生产仓库仍然独立保留。
 - 不承诺 clone 后即可端到端复现私有生产流水线。
 - 不存放生产 secrets、raw outputs、webhook configs 或 private
   operational notes。
+- 不是完整源码导出；production-only modules 和大部分测试被有意省略，
+  以保持公开审阅面聚焦。
 
 ## 你可以审阅什么
 
@@ -55,8 +57,8 @@ Actions 生产运行配置。私有生产仓库仍然独立保留。
 - `demo_run/` 下脱敏、模拟的 demo artifacts。
 - Cloudflare + GitHub Actions trigger pattern。它是可审阅的部署模式，
   不是 live deployment。
-- 关键 runtime reconciliation 与 safety logic，特别是 report
-  reconciliation、lint、evidence gates 和 publish/bot guardrails。
+- 选取后的 runtime code slices，特别是 report reconciliation logic 和
+  Cloudflare trigger pattern。
 
 ## 你可以在本地运行什么
 
@@ -65,7 +67,12 @@ Actions 生产运行配置。私有生产仓库仍然独立保留。
 ```bash
 python3 evals/check_ai_radar_week2_eval_cases.py
 python3 -m json.tool demo_run/demo_manifest.json
-python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
+python3 -m py_compile \
+  ai_radar_agent/dates.py \
+  ai_radar_agent/models.py \
+  ai_radar_agent/report_reconcile.py \
+  tests/test_report_reconcile.py \
+  tests/test_cloudflare_trigger.py
 ```
 
 完整私有生产流水线不属于这个 public mirror 的可运行范围。
@@ -81,6 +88,8 @@ python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_recon
 - 私有生产 source configuration。
 - 私有生产 prompts。
 - 私有部署配置和账号级设置。
+- Production-only Python modules、provider integrations、Feishu publishing
+  implementation、完整 regression tests、packaging metadata 和 raw state。
 
 在私有生产仓库中，source configuration 和 report prompts 会放在类似
 `config/sources.yaml` 与 `prompts/radar_prompt.md` 的文件中。
@@ -121,8 +130,9 @@ AI Radar Agent 是一个证据优先的情报与发布代理。它收集公开 A
 | Runtime eval integration | 计划中 | Checker 校验定义，不校验真实 runtime behavior。 |
 | Sanitized demo run | 已实现 | Demo artifacts 使用确定性 mock data，并明确标记为 simulated。 |
 | 中文文档 | 已实现 | 中文镜像文档位于 `README.zh-CN.md` 和 `docs/zh-CN/`。 |
+| Selected code slices | 已实现 | 镜像保留代表性的 report reconciliation 和 trigger-pattern code，不保留完整生产代码库。 |
 | External publish | 私有生产环境控制（human-gated） | 真实发布能力不属于公开镜像的可运行范围。 |
-| Dashboard/screenshots | 计划中 | 不属于本次 mirror polish。 |
+| Dashboard/screenshots | 计划中 | 不包含在这个 curated showcase mirror 中。 |
 
 ## 工作流草图
 
@@ -139,8 +149,9 @@ Trigger pattern or local operator
   -> local artifacts or private production publish path
 ```
 
-公开镜像包含让这个 workflow 可审阅的代码、文档、schemas、evals 和脱敏
-demo artifacts。它不包含端到端运行生产路径所需的私有配置。
+公开镜像包含让这个 workflow 可审阅的 selected code slices、文档、
+schemas、evals 和脱敏 demo artifacts。它不包含端到端运行生产路径所需的
+私有配置或完整生产实现。
 
 ## 产物地图
 
@@ -161,22 +172,21 @@ demo artifacts。它不包含端到端运行生产路径所需的私有配置。
 | [evals/check_ai_radar_week2_eval_cases.py](evals/check_ai_radar_week2_eval_cases.py) | 本地静态 checker。 |
 | [demo_run/demo_output_report.md](demo_run/demo_output_report.md) | 脱敏模拟 demo report。 |
 | [docs/case_study_ai_radar_week2.md](docs/case_study_ai_radar_week2.md) | Public case-study draft。 |
+| [ai_radar_agent/report_reconcile.py](ai_radar_agent/report_reconcile.py) | 代表性的 report/brief reconciliation runtime code slice。 |
+| [cloudflare/ai-radar-trigger/src/index.js](cloudflare/ai-radar-trigger/src/index.js) | Mirror-safe Worker trigger-pattern code。 |
 
 ## 公开仓库结构
 
 ```text
 .
-├── ai_radar_agent/          # 供审阅的 Python package 和 runtime logic
-├── ai_radar_agent/fetchers/ # RSS、Bocha、Tavily fetcher modules
+├── ai_radar_agent/          # 供审阅的 selected Python code slices
 ├── cloudflare/              # Mirror-safe Worker trigger pattern
 ├── demo_run/                # 脱敏模拟 demo artifacts
-├── docs/                    # Architecture、workflow、operations docs
+├── docs/                    # Curated architecture、workflow、safety docs
 ├── evals/                   # Static no-side-effect eval cases and checker
 ├── schemas/                 # RunManifest / ToolCall schema contracts
-├── state/                   # 仅 sample event-history shape
-├── tests/                   # Regression tests
+├── tests/                   # Retained code slices 的 representative tests
 ├── .github/workflows/       # Manual workflow pattern
-├── pyproject.toml
 └── README.md
 ```
 
@@ -197,8 +207,8 @@ demo artifacts。它不包含端到端运行生产路径所需的私有配置。
 ## Cloudflare 与 GitHub Actions Pattern
 
 镜像包含 `cloudflare/ai-radar-trigger/` 下的 Cloudflare Worker trigger
-pattern，以及 `.github/workflows/` 下的 manual GitHub Actions workflow
-pattern。
+pattern，以及 `.github/workflows/` 下的 manual GitHub Actions static-check
+workflow。
 
 这些文件用于 architecture 和 safety review。它们不表示这个公开仓库已经部署
 到 Cloudflare，也不表示它连接了真实 Feishu/provider credentials。
@@ -230,6 +240,8 @@ pattern。
   sanitized demos。
 - 私有 production runbooks、prompts、source configs 和 state 应留在公开
   mirror 之外。
+- 除非 production-only implementation files 能显著帮助架构审阅，否则应留在
+  public showcase 之外。
 - 更新文档时，应保持 implemented、partial、planned、simulated 和
   private-production-only 的区别。
 - 更新 Cloudflare 示例时，应保持 mirror-safe defaults，不加入真实 account

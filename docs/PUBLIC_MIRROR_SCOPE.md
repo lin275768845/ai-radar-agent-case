@@ -9,8 +9,8 @@ reproduce the private production deployment end to end.
 ## Purpose
 
 - Review the evidence-first intelligence-agent architecture.
-- Review workflow design, autonomy boundaries, gates, schemas, evals, and
-  sanitized demo artifacts.
+- Review workflow design, autonomy boundaries, gates, schemas, evals,
+  selected code slices, and sanitized demo artifacts.
 - Show the Cloudflare plus GitHub Actions trigger pattern without exposing live
   deployment state.
 - Make the public safety posture inspectable without publishing private runtime
@@ -18,13 +18,15 @@ reproduce the private production deployment end to end.
 
 ## Included
 
-- Core Python package modules needed to understand the runtime design.
+- Selected Python code slices needed to understand representative runtime
+  design choices.
 - Architecture, workflow, gate, runbook, observability, and case-study
   documentation.
 - `RunManifest` and `ToolCall` schema contracts.
 - No-side-effect eval definitions and the static checker.
 - Sanitized simulated demo artifacts.
 - Mirror-safe Cloudflare Worker pattern files.
+- A manual static-check workflow for public mirror validation.
 
 ## Excluded
 
@@ -35,6 +37,8 @@ reproduce the private production deployment end to end.
   and private operational notes.
 - Private production prompts and source configuration.
 - Private Cloudflare, GitHub, Feishu, provider, and account settings.
+- Production-only Python modules, provider integrations, Feishu publishing
+  implementation, full regression tests, packaging metadata, and raw state.
 
 In the private production repo, source configuration and report prompts are
 kept in files such as `config/sources.yaml` and `prompts/radar_prompt.md`.
@@ -48,6 +52,7 @@ Those files are intentionally excluded from this public mirror.
 - Runtime schema direction.
 - Static eval methodology.
 - Sanitized demo artifact shape.
+- Representative report reconciliation code.
 - Cloudflare/GitHub trigger pattern as architecture, not live deployment.
 
 ## Local Checks
@@ -55,7 +60,12 @@ Those files are intentionally excluded from this public mirror.
 ```bash
 python3 evals/check_ai_radar_week2_eval_cases.py
 python3 -m json.tool demo_run/demo_manifest.json
-python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
+python3 -m py_compile \
+  ai_radar_agent/dates.py \
+  ai_radar_agent/models.py \
+  ai_radar_agent/report_reconcile.py \
+  tests/test_report_reconcile.py \
+  tests/test_cloudflare_trigger.py
 ```
 
 ## Runability Boundary

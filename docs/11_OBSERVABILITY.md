@@ -5,8 +5,10 @@
 - Status: Active
 - Last Updated: 2026-06-27
 - Owner: Unknown
-- Source of Truth: ai_radar_agent/__main__.py, utils.py, report_lint.py, brief.py, feishu_result.py, feishu_bot.py, evidence_gate.py, event_history.py, top_event_audit.py
-- Related Files: ai_radar_agent/__main__.py, ai_radar_agent/utils.py, ai_radar_agent/report_lint.py, ai_radar_agent/brief.py, ai_radar_agent/feishu_result.py, ai_radar_agent/feishu_bot.py, ai_radar_agent/evidence_gate.py, ai_radar_agent/event_history.py, ai_radar_agent/top_event_audit.py, outputs/
+- Source of Truth: schemas, evals, sanitized demo artifacts, and private production runtime files
+- Related Files: `schemas/`, `evals/`, `demo_run/`, selected code slices under `ai_radar_agent/`
+- Public Mirror Note: production runtime files and `outputs/` are intentionally
+  omitted from this curated public showcase.
 
 ## AS-IS 当前实现
 
@@ -114,7 +116,7 @@ Status: schema implemented; runtime generation planned. Do not record real secre
     {"name": "recall", "status": "ok", "started_at": "...", "ended_at": "..."}
   ],
   "llm_calls": [
-    {"name": "report_generation", "model": "deepseek-v4-pro", "status": "ok", "prompt_ref": "prompts/radar_prompt.md"}
+    {"name": "report_generation", "model": "deepseek-v4-pro", "status": "ok", "prompt_ref": "private-production-prompt"}
   ],
   "tool_calls": [
     {"tool": "bocha", "queries_used": 10, "status": "ok"}

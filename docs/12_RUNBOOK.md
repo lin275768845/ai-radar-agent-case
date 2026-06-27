@@ -5,8 +5,11 @@
 - Status: Active
 - Last Updated: 2026-06-27
 - Owner: Unknown
-- Source of Truth: README, .github/workflows/daily.yml, pyproject.toml, ai_radar_agent/__main__.py, Dockerfile, docker-compose.yml
-- Related Files: README.md, .env.example, .github/workflows/daily.yml, ai_radar_agent/__main__.py, docs/GITHUB_SYNC.md
+- Source of Truth: README, `.github/workflows/daily.yml`, evals, schemas, demo artifacts
+- Related Files: README.md, `.github/workflows/daily.yml`, `evals/`, `schemas/`, `demo_run/`
+- Public Mirror Note: this curated mirror omits production CLI, packaging,
+  prompt/config files, provider integrations, Feishu publishing code, and raw
+  runtime state.
 
 ## AS-IS 当前实现
 
@@ -23,49 +26,20 @@ Prefer the safest mode that answers the question:
 
 Do not trigger Feishu, GitHub workflow dispatch, provider writes, bot send, or production publish during documentation, planning, or inspection tasks.
 
-### Local Run
+### Public Mirror Local Checks
 
-Install:
-
-```bash
-pip install -e .
-```
-
-Run evidence only:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --skip-llm
-```
-
-Run without external publish:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --dry-run
-```
-
-Replay an existing evidence file:
-
-```bash
-python -m ai_radar_agent --date 2026-06-01 --dry-run --output-mode none
-```
-
-Run Week 2 static checks:
+This curated public mirror is not a production run repository. Run only local
+static checks:
 
 ```bash
 python3 evals/check_ai_radar_week2_eval_cases.py
 python3 -m json.tool demo_run/demo_manifest.json
-```
-
-Console script:
-
-```bash
-ai-radar-agent --date 2026-06-01 --dry-run
-```
-
-Docker:
-
-```bash
-docker compose up --build
+python3 -m py_compile \
+  ai_radar_agent/dates.py \
+  ai_radar_agent/models.py \
+  ai_radar_agent/report_reconcile.py \
+  tests/test_report_reconcile.py \
+  tests/test_cloudflare_trigger.py
 ```
 
 ### Production Run
@@ -197,11 +171,9 @@ Current duplicate prevention is local to `outputs/<date>/publish_result.json`. I
 
 ### Prompt Change Procedure
 
-1. Read `prompts/radar_prompt.md` and `docs/08_PROMPTS.md`.
-2. Make a minimal prompt change only when explicitly authorized.
-3. Run parsing/report lint tests relevant to the change.
-4. Run dry-run validation.
-5. Do not publish from a prompt-change branch without human confirmation.
+Production prompt files are intentionally excluded from this public mirror.
+Prompt changes belong in the private production repository and require human
+authorization, relevant tests, dry-run validation, and publish-gate review.
 
 ### Schema Change Procedure
 

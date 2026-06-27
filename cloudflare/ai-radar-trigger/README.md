@@ -9,7 +9,7 @@ live Cloudflare, Feishu, provider, or GitHub production deployment.
 
 ## Mirror-Safe Defaults
 
-The committed `wrangler.toml` uses public-mirror defaults:
+The committed `wrangler.toml` and Worker source use public-mirror defaults:
 
 - `GITHUB_REPO = "ai-radar-agent-case"`
 - `GITHUB_REF = "main"`
@@ -34,6 +34,18 @@ Cloudflare cron uses UTC, so this corresponds to 10:00 Asia/Shanghai.
 
 This schedule is included as a pattern example. It does not mean this public
 mirror is deployed or connected to production.
+
+## Public Mirror Dispatch Inputs
+
+The Worker source dispatches the public mirror workflow with a small,
+no-side-effect input set:
+
+- `date`
+- `dry_run`
+- `bocha_enabled`
+
+The workflow in this repository runs static checks only. It does not call
+provider APIs, LLMs, Feishu, webhooks, or production pipeline code.
 
 ## Private Deployment Variables
 

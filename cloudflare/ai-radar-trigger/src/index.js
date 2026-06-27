@@ -21,7 +21,7 @@ function isTrueLike(value) {
 
 async function dispatchGitHub(env, source) {
   const owner = env.GITHUB_OWNER || "lin275768845";
-  const repo = env.GITHUB_REPO || "ai-radar-agent";
+  const repo = env.GITHUB_REPO || "ai-radar-agent-case";
   const workflow = env.GITHUB_WORKFLOW || "daily.yml";
   const ref = env.GITHUB_REF || DEFAULT_GITHUB_REF;
 
@@ -35,14 +35,7 @@ async function dispatchGitHub(env, source) {
     inputs: {
       date: "",
       dry_run: "false",
-      skip_llm: "false",
-      send_bot: "true",
-      output_mode: "feishu_docx_import",
-      tavily_enabled: "false",
-      bocha_enabled: isTrueLike(env.BOCHA_ENABLED) ? "true" : "false",
-      force_republish: "false",
-      report_lint_policy: "warn",
-      bot_block_on_lint_critical: "false"
+      bocha_enabled: isTrueLike(env.BOCHA_ENABLED) ? "true" : "false"
     }
   };
 

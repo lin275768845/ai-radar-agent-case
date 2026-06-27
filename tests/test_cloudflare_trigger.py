@@ -23,7 +23,8 @@ def test_cloudflare_worker_files_are_versioned_without_real_tokens():
     assert 'const DEFAULT_GITHUB_REF = "main"' in index_text
     assert "single_card_v7.1" not in index_text
     assert "bocha_enabled" in index_text
-    assert 'BOCHA_ENABLED = "true"' in wrangler_text
+    assert 'GITHUB_REPO = "ai-radar-agent-case"' in wrangler_text
+    assert 'BOCHA_ENABLED = "false"' in wrangler_text
     assert 'crons = ["0 2 * * *"]' in wrangler_text
     assert "Authorization: Bearer <MANUAL_TRIGGER_SECRET>" in readme_text
 
@@ -39,16 +40,12 @@ def test_cloudflare_dispatch_payload_has_explicit_provider_controls():
     readme_text = (root / "README.md").read_text(encoding="utf-8")
 
     assert 'dry_run: "false"' in index_text
-    assert 'skip_llm: "false"' in index_text
-    assert 'send_bot: "true"' in index_text
-    assert 'output_mode: "feishu_docx_import"' in index_text
-    assert 'tavily_enabled: "false"' in index_text
     assert "const ref = env.GITHUB_REF || DEFAULT_GITHUB_REF" in index_text
 
     assert "function isTrueLike(value)" in index_text
     assert '["true", "1", "yes", "on"]' in index_text
     assert 'bocha_enabled: isTrueLike(env.BOCHA_ENABLED) ? "true" : "false"' in index_text
 
-    assert "`BOCHA_ENABLED`: set to `true`" in readme_text
-    assert "workflow input `bocha_enabled=true`" in readme_text
-    assert "workflow input `bocha_enabled`" in readme_text
+    assert '`BOCHA_ENABLED = "false"`' in readme_text
+    assert "public-mirror defaults" in readme_text
+    assert "explicit `bocha_enabled` workflow input" in readme_text

@@ -5,7 +5,9 @@
 - Status: active
 - Last Updated: 2026-06-19
 - Source of Truth: repository code, `README.md`, `.github/workflows/daily.yml`, tests
-- Related Files: `fetchers/rss.py`, `fetchers/bocha_search.py`, `fetchers/tavily_search.py`, `llm.py`, `feishu.py`, `feishu_docx.py`, `feishu_bot.py`, `report_lint.py`, `brief.py`
+- Related Files: selected public code slices, schemas, evals, demo artifacts;
+  full provider, LLM, Feishu, bot, report-lint, and brief-generation
+  implementation files are omitted from this curated mirror.
 
 ## Permission Principle
 

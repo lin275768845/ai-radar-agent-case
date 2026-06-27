@@ -6,7 +6,8 @@
 - 代理类型： 证据优先的情报与发布代理
 - 状态： active
 - 最后更新： 2026-06-19
-- 事实来源： repository code, `README.md`, `.github/workflows/daily.yml`, tests
+- 事实来源： README、workflow docs、schemas、evals、demo artifacts，以及私有生产 runtime files
+- 公开镜像说明：完整生产 runtime files 不包含在 curated public mirror 中。
 
 ## 工作流概览
 
@@ -34,12 +35,12 @@ workflow_dispatch / CLI
 | --- | --- | --- | --- | --- | --- |
 | Trigger: `workflow_dispatch` / CLI | 已实现（implemented） | GitHub workflow inputs 或 CLI args | parsed settings 和 requested date | GitHub run metadata when available | Input/date gate |
 | Beijing day window | 已实现（implemented） | target date 或 blank date | Asia/Shanghai natural day 的 `TimeWindow` | Summary fields；date-specific output path | Time window gate |
-| RSS recall | 已实现（implemented） | `config/sources.yaml`，target window | RSS evidence items 和 RSS audit | `evidence.json`, `evidence.md` | Provider degradation gate；Evidence Gate |
+| RSS recall | 私有 runtime 已实现（implemented） | private source configuration，target window | RSS evidence items 和 RSS audit | `evidence.json`, `evidence.md` | Provider degradation gate；Evidence Gate |
 | Bocha recall | 已实现（implemented） | query baskets，target window，configured key | search evidence items 和 provider audit | `evidence.json`, `evidence.md` | Tool permission gate；provider degradation gate |
 | Tavily recall | 已实现（implemented） | query baskets，target window，enabled flag，configured key | optional search evidence items 和 provider audit | `evidence.json`, `evidence.md` | Cost gate；provider degradation gate |
 | Evidence dedupe and cap | 已实现（implemented） | raw evidence list | unique capped evidence list | `evidence.json` | Dedupe gate |
 | Evidence Gate + history | 已实现（implemented） | raw evidence，source quality config，event history | filtered/marked evidence 和 dropped evidence audit | `evidence_gate.json`, `evidence_dropped.md`, `event_history_matches.json`, `event_history_context.md` | Evidence Gate；history gate；privacy gate |
-| Report generation | 已实现（implemented） | `prompts/radar_prompt.md`，target window，filtered evidence context | Markdown radar report | `AI_radar_<date>.md` | Prompt source gate；source URL guardrail |
+| Report generation | 私有 runtime 已实现（implemented） | private prompt，target window，filtered evidence context | Markdown radar report | `AI_radar_<date>.md` | Prompt source gate；source URL guardrail |
 | Report source appendix | 已实现（implemented） | Report Markdown 和 evidence | 必要时带 fallback source appendix 的 report | `AI_radar_<date>.md` | Source URL guardrail |
 | `report_lint` | 已实现（implemented） | Report Markdown 和 evidence | lint warnings/errors/critical errors | `report_lint.json` | report_lint gate |
 | Brief generation and repair | 已实现（implemented） | report，audit，evidence catalog | normalized brief data 和 brief Markdown | `brief.json`, `brief.md` | Brief schema/source_ids normalization gate |

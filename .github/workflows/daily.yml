@@ -1,221 +1,54 @@
-name: Daily AI Radar
+name: Public Mirror Static Checks
 
 on:
   workflow_dispatch:
     inputs:
       date:
-        description: "Target date, YYYY-MM-DD. Leave blank to use yesterday in Asia/Shanghai."
+        description: "Optional date label for review context; no production run is executed."
         required: false
         default: ""
         type: string
       dry_run:
-        description: "Dry run: generate artifacts only, no Feishu publish, no group card."
-        required: false
-        default: false
-        type: boolean
-      skip_llm:
-        description: "Evidence only: collect sources but skip DeepSeek report generation."
-        required: false
-        default: false
-        type: boolean
-      send_bot:
-        description: "Send Feishu group card after successful publish."
-        required: false
-        default: true
-        type: boolean
-      output_mode:
-        description: "Publish target"
-        required: false
-        default: feishu_docx_import
-        type: choice
-        options:
-          - feishu_docx_import
-          - feishu_drive_md
-          - none
-      tavily_enabled:
-        description: "Use Tavily as extra search provider, costs Tavily quota."
+        description: "Always treated as no-side-effect validation in this public mirror."
         required: false
         default: false
         type: boolean
       bocha_enabled:
-        description: "Use Bocha as search provider for this run. Default off; requires BOCHA_API_KEY secret."
+        description: "Pattern input only; provider calls are not made by this workflow."
         required: false
         default: false
         type: boolean
-      force_republish:
-        description: "Force re-publish even if publish_result.json exists."
-        required: false
-        default: false
-        type: boolean
-      report_lint_policy:
-        description: "Report quality policy"
-        required: false
-        default: block_bot
-        type: choice
-        options:
-          - warn
-          - block_bot
-          - strict
-          - off
-      bot_block_on_lint_critical:
-        description: "Block group card when report lint has critical errors."
-        required: false
-        default: false
-        type: boolean
-      deepseek_model:
-        description: "DeepSeek model id for workflow_dispatch runs."
-        required: false
-        default: deepseek-v4-pro
-        type: string
-
-concurrency:
-  group: daily-ai-radar
-  cancel-in-progress: false
 
 permissions:
-  contents: write
-
-env:
-  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+  contents: read
 
 jobs:
-  run:
+  static-checks:
     runs-on: ubuntu-latest
-    timeout-minutes: 35
-    env:
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-      DEEPSEEK_BASE_URL: ${{ secrets.DEEPSEEK_BASE_URL || vars.DEEPSEEK_BASE_URL || 'https://api.deepseek.com' }}
-      DEEPSEEK_MODEL: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.deepseek_model || 'deepseek-v4-pro') || secrets.DEEPSEEK_MODEL || vars.DEEPSEEK_MODEL || 'deepseek-v4-pro' }}
-      SEARCH_PROVIDERS: ${{ vars.SEARCH_PROVIDERS || 'rss,bocha' }}
-      MAX_SEARCH_QUERIES_PER_RUN: ${{ vars.MAX_SEARCH_QUERIES_PER_RUN || '30' }}
-      MAX_SEARCH_RESULTS_PER_PROVIDER: ${{ vars.MAX_SEARCH_RESULTS_PER_PROVIDER || '80' }}
-      MAX_EVIDENCE_ITEMS: ${{ vars.MAX_EVIDENCE_ITEMS || '80' }}
-      BOCHA_API_KEY: ${{ secrets.BOCHA_API_KEY }}
-      BOCHA_ENABLED: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.bocha_enabled == 'true' && 'true' || 'false' }}
-      BOCHA_BASE_URL: ${{ vars.BOCHA_BASE_URL || 'https://api.bochaai.com' }}
-      BOCHA_MAX_QUERIES: ${{ vars.BOCHA_MAX_QUERIES || '20' }}
-      BOCHA_MAX_RESULTS_PER_QUERY: ${{ vars.BOCHA_MAX_RESULTS_PER_QUERY || '5' }}
-      BOCHA_CONNECT_TIMEOUT: ${{ vars.BOCHA_CONNECT_TIMEOUT || '5' }}
-      BOCHA_READ_TIMEOUT: ${{ vars.BOCHA_READ_TIMEOUT || '15' }}
-      TAVILY_API_KEY: ${{ secrets.TAVILY_API_KEY }}
-      TAVILY_ENABLED: ${{ github.event_name != 'workflow_dispatch' && (vars.TAVILY_ENABLED || 'false') || (github.event.inputs.tavily_enabled == 'true' && 'true' || 'false') }}
-      TAVILY_CONNECT_TIMEOUT: ${{ vars.TAVILY_CONNECT_TIMEOUT || '5' }}
-      TAVILY_READ_TIMEOUT: ${{ vars.TAVILY_READ_TIMEOUT || '15' }}
-      TAVILY_MAX_QUERIES: ${{ vars.TAVILY_MAX_QUERIES || '8' }}
-      TAVILY_MAX_RESULTS_PER_QUERY: ${{ vars.TAVILY_MAX_RESULTS_PER_QUERY || '3' }}
-      TAVILY_MAX_CONSECUTIVE_CONNECT_FAILURES: ${{ vars.TAVILY_MAX_CONSECUTIVE_CONNECT_FAILURES || '2' }}
-      FEISHU_APP_ID: ${{ secrets.FEISHU_APP_ID }}
-      FEISHU_APP_SECRET: ${{ secrets.FEISHU_APP_SECRET }}
-      FEISHU_FOLDER_TOKEN: ${{ secrets.FEISHU_FOLDER_TOKEN }}
-      FEISHU_TEMP_FOLDER_TOKEN: ${{ secrets.FEISHU_TEMP_FOLDER_TOKEN }}
-      FEISHU_KEEP_MD_ARCHIVE: ${{ vars.FEISHU_KEEP_MD_ARCHIVE || 'false' }}
-      FEISHU_DOC_BASE_URL: ${{ vars.FEISHU_DOC_BASE_URL || 'https://my.feishu.cn' }}
-      FEISHU_IMPORT_POLL_TIMEOUT_SECONDS: ${{ vars.FEISHU_IMPORT_POLL_TIMEOUT_SECONDS || '180' }}
-      FEISHU_IMPORT_POLL_INTERVAL_SECONDS: ${{ vars.FEISHU_IMPORT_POLL_INTERVAL_SECONDS || '3' }}
-      PRINT_FEISHU_URL_IN_SUMMARY: ${{ vars.PRINT_FEISHU_URL_IN_SUMMARY || 'true' }}
-      FEISHU_BOT_WEBHOOK_URL: ${{ secrets.FEISHU_BOT_WEBHOOK_URL }}
-      FEISHU_BOT_SECRET: ${{ secrets.FEISHU_BOT_SECRET }}
-      FEISHU_BOT_FALLBACK_TEXT: ${{ vars.FEISHU_BOT_FALLBACK_TEXT || 'true' }}
-      EVIDENCE_GATE_ENABLED: ${{ vars.EVIDENCE_GATE_ENABLED || 'true' }}
-      EVENT_HISTORY_ENABLED: ${{ vars.EVENT_HISTORY_ENABLED || 'true' }}
-      EVENT_HISTORY_LOOKBACK_DAYS: ${{ vars.EVENT_HISTORY_LOOKBACK_DAYS || '5' }}
-      EVENT_HISTORY_PATH: ${{ vars.EVENT_HISTORY_PATH || 'state/event_history.jsonl' }}
-      EVENT_HISTORY_WRITE_ENABLED: ${{ vars.EVENT_HISTORY_WRITE_ENABLED || 'true' }}
-      EVENT_HISTORY_COMMIT_ENABLED: ${{ vars.EVENT_HISTORY_COMMIT_ENABLED || 'true' }}
-      EVENT_HISTORY_COMMIT_REF: ${{ vars.EVENT_HISTORY_COMMIT_REF || 'main' }}
-      EVENT_HISTORY_FILTER_MODE: ${{ vars.EVENT_HISTORY_FILTER_MODE || 'mark' }}
-      PRIMARY_SOURCE_ENRICHMENT_ENABLED: ${{ vars.PRIMARY_SOURCE_ENRICHMENT_ENABLED || 'true' }}
-      PRIMARY_SOURCE_MAX_QUERIES: ${{ vars.PRIMARY_SOURCE_MAX_QUERIES || '8' }}
-      PRIMARY_SOURCE_MAX_RESULTS_PER_QUERY: ${{ vars.PRIMARY_SOURCE_MAX_RESULTS_PER_QUERY || '3' }}
-      RADAR_TIMEZONE: Asia/Shanghai
-      OUTPUT_MODE: ${{ github.event.inputs.output_mode || 'feishu_docx_import' }}
-      REPORT_LINT_POLICY: ${{ github.event_name == 'workflow_dispatch' && (github.event.inputs.report_lint_policy || 'block_bot') || 'block_bot' }}
-      BOT_BLOCK_ON_LINT_CRITICAL: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.bot_block_on_lint_critical == 'true' && 'true' || 'false' }}
-      STRICT_REPORT_LINT: ${{ vars.STRICT_REPORT_LINT || 'false' }}
-      TARGET_DATE: ${{ github.event.inputs.date || '' }}
-      DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.dry_run == 'true' && 'true' || 'false' }}
-      SKIP_LLM: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.skip_llm == 'true' && 'true' || 'false' }}
-      SEND_BOT: ${{ github.event_name != 'workflow_dispatch' && 'true' || (github.event.inputs.send_bot != 'false' && 'true' || 'false') }}
-      FORCE_REPUBLISH: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.force_republish == 'true' && 'true' || 'false' }}
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.ref_name }}
+
       - uses: actions/setup-python@v6
         with:
           python-version: "3.11"
-      - name: Install dependencies
-        run: pip install -e .
-      - name: Generate daily radar
-        timeout-minutes: 25
-        shell: bash
+
+      - name: Validate eval definitions
+        run: python3 evals/check_ai_radar_week2_eval_cases.py
+
+      - name: Validate demo manifest JSON
+        run: python3 -m json.tool demo_run/demo_manifest.json >/dev/null
+
+      - name: Compile showcase Python slice
         run: |
-          args=(--verbose)
-          if [ -n "$TARGET_DATE" ]; then
-            args+=(--date "$TARGET_DATE")
-          fi
-          if [ "$DRY_RUN" = "true" ]; then
-            args+=(--dry-run)
-          fi
-          if [ "$SKIP_LLM" = "true" ]; then
-            args+=(--skip-llm)
-          fi
-          if [ "$FORCE_REPUBLISH" = "true" ]; then
-            args+=(--force-republish)
-          fi
-          python -m ai_radar_agent "${args[@]}"
-      - name: Commit event history
-        if: success() && env.EVENT_HISTORY_COMMIT_ENABLED == 'true' && env.EVENT_HISTORY_WRITE_ENABLED == 'true' && env.DRY_RUN == 'false' && env.SKIP_LLM == 'false'
-        shell: bash
+          python3 -m py_compile \
+            ai_radar_agent/dates.py \
+            ai_radar_agent/models.py \
+            ai_radar_agent/report_reconcile.py \
+            tests/test_report_reconcile.py \
+            tests/test_cloudflare_trigger.py
+
+      - name: Confirm no production pipeline
         run: |
-          set +e
-          echo "- event_history_commit_enabled: true" >> "$GITHUB_STEP_SUMMARY"
-          echo "- event_history_commit_attempted: true" >> "$GITHUB_STEP_SUMMARY"
-          echo "- event_history_commit_ref: ${EVENT_HISTORY_COMMIT_REF}" >> "$GITHUB_STEP_SUMMARY"
-          echo "- event_history_current_ref: ${GITHUB_REF_NAME}" >> "$GITHUB_STEP_SUMMARY"
-          if [ "$GITHUB_REF_TYPE" = "tag" ] || [ -z "$GITHUB_REF_NAME" ]; then
-            echo "- event_history_commit_succeeded: false" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: unsupported_ref_for_history_commit" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if [ "$GITHUB_REF_NAME" != "$EVENT_HISTORY_COMMIT_REF" ]; then
-            echo "- event_history_commit_succeeded: false" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: ref_not_allowed_for_history_commit" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          if [ ! -f "$EVENT_HISTORY_PATH" ]; then
-            echo "- event_history_commit_succeeded: false" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: missing_history_file" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          git config user.name "ai-radar-bot"
-          git config user.email "ai-radar-bot@users.noreply.github.com"
-          git add "$EVENT_HISTORY_PATH"
-          if git diff --cached --quiet; then
-            echo "- event_history_commit_succeeded: true" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: no_changes" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          history_date="${TARGET_DATE:-$(TZ=Asia/Shanghai date -d 'yesterday' +%F)}"
-          git commit -m "Update AI Radar event history for ${history_date} [skip ci]"
-          commit_status=$?
-          if [ "$commit_status" -ne 0 ]; then
-            echo "- event_history_commit_succeeded: false" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: commit_failed" >> "$GITHUB_STEP_SUMMARY"
-            exit 0
-          fi
-          git push origin "HEAD:${GITHUB_REF_NAME}"
-          push_status=$?
-          if [ "$push_status" -eq 0 ]; then
-            echo "- event_history_commit_succeeded: true" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error:" >> "$GITHUB_STEP_SUMMARY"
-          else
-            echo "- event_history_commit_succeeded: false" >> "$GITHUB_STEP_SUMMARY"
-            echo "- event_history_commit_error: push_failed" >> "$GITHUB_STEP_SUMMARY"
-          fi
-      # Keep v4 until actions/upload-artifact@v6 is available in GitHub Actions.
-      - uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: ai-radar-outputs
-          path: outputs/
+          echo "This public mirror workflow runs static checks only."
+          echo "No provider APIs, LLMs, Feishu, webhooks, Cloudflare deploys, or production pipeline steps are executed."

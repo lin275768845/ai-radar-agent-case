@@ -27,8 +27,9 @@ For the concise scope statement, see
 - A case-study repository for evidence-first intelligence-agent architecture.
 - A review target for workflow design, gates, autonomy boundaries, schema
   contracts, evals, demo artifacts, and public safety posture.
-- A public artifact that shows the shape of the system without exposing
-  credentials, private runtime state, or production publishing history.
+- A curated public artifact that shows the shape of the system without
+  exposing credentials, private runtime state, or production publishing
+  history.
 
 ## What This Mirror Is Not
 
@@ -40,6 +41,8 @@ For the concise scope statement, see
   clone.
 - Not a place where production secrets, raw outputs, webhook configs, or
   private operational notes are stored.
+- Not a complete source export; production-only modules and tests are omitted
+  to keep the public review surface focused.
 
 ## What You Can Review
 
@@ -54,8 +57,8 @@ For the concise scope statement, see
 - Sanitized simulated demo artifacts under `demo_run/`.
 - Cloudflare plus GitHub Actions trigger pattern as a reviewable deployment
   pattern, not as a live deployment.
-- Runtime reconciliation and safety logic, especially report reconciliation,
-  linting, evidence gates, and publish/bot guardrails.
+- Selected runtime code slices, especially report reconciliation logic and the
+  Cloudflare trigger pattern.
 
 ## What You Can Run Locally
 
@@ -65,7 +68,12 @@ external side effects:
 ```bash
 python3 evals/check_ai_radar_week2_eval_cases.py
 python3 -m json.tool demo_run/demo_manifest.json
-python3 -m py_compile ai_radar_agent/report_reconcile.py tests/test_report_reconcile.py
+python3 -m py_compile \
+  ai_radar_agent/dates.py \
+  ai_radar_agent/models.py \
+  ai_radar_agent/report_reconcile.py \
+  tests/test_report_reconcile.py \
+  tests/test_cloudflare_trigger.py
 ```
 
 The full private production pipeline is intentionally out of scope for this
@@ -82,6 +90,8 @@ mirror.
 - Private production source configuration.
 - Private production prompts.
 - Private deployment settings and account-level configuration.
+- Production-only Python modules, provider integrations, Feishu publishing
+  implementation, full regression tests, packaging metadata, and raw state.
 
 In the private production repo, source configuration and report prompts are
 kept in files such as `config/sources.yaml` and `prompts/radar_prompt.md`.
@@ -124,8 +134,9 @@ The public mirror focuses on the agent design:
 | Runtime eval integration | Planned | The checker validates definitions, not live runtime behavior. |
 | Sanitized demo run | Implemented | Demo artifacts are deterministic mock data and explicitly simulated. |
 | Chinese docs | Implemented | Chinese mirror docs live in `README.zh-CN.md` and `docs/zh-CN/`. |
+| Selected code slices | Implemented | The mirror keeps representative report reconciliation and trigger-pattern code, not the full production codebase. |
 | External publish | Private/human-gated | Real publish controls belong to the private production environment. |
-| Dashboard/screenshots | Planned | Not part of this mirror polish pass. |
+| Dashboard/screenshots | Planned | Not included in this curated showcase mirror. |
 
 ## Workflow Sketch
 
@@ -142,9 +153,10 @@ Trigger pattern or local operator
   -> local artifacts or private production publish path
 ```
 
-The public mirror includes code, docs, schemas, evals, and sanitized demo
-artifacts that make this workflow reviewable. It does not include the private
-configuration required to run the production path end to end.
+The public mirror includes selected code slices, docs, schemas, evals, and
+sanitized demo artifacts that make this workflow reviewable. It does not
+include the private configuration or complete production implementation
+required to run the production path end to end.
 
 ## Review Map
 
@@ -165,22 +177,21 @@ configuration required to run the production path end to end.
 | [evals/check_ai_radar_week2_eval_cases.py](evals/check_ai_radar_week2_eval_cases.py) | Local static checker. |
 | [demo_run/demo_output_report.md](demo_run/demo_output_report.md) | Sanitized simulated demo report. |
 | [docs/case_study_ai_radar_week2.md](docs/case_study_ai_radar_week2.md) | Public case-study draft. |
+| [ai_radar_agent/report_reconcile.py](ai_radar_agent/report_reconcile.py) | Representative runtime code slice for report/brief reconciliation. |
+| [cloudflare/ai-radar-trigger/src/index.js](cloudflare/ai-radar-trigger/src/index.js) | Mirror-safe Worker trigger-pattern code. |
 
 ## Public Repository Structure
 
 ```text
 .
-├── ai_radar_agent/          # Python package and runtime logic for review
-├── ai_radar_agent/fetchers/ # RSS, Bocha, and Tavily fetcher modules
+├── ai_radar_agent/          # Selected Python code slices for review
 ├── cloudflare/              # Mirror-safe Worker trigger pattern
 ├── demo_run/                # Sanitized simulated demo artifacts
-├── docs/                    # Architecture, workflow, and operations docs
+├── docs/                    # Curated architecture, workflow, and safety docs
 ├── evals/                   # Static no-side-effect eval cases and checker
 ├── schemas/                 # RunManifest / ToolCall schema contracts
-├── state/                   # Sample event-history shape only
-├── tests/                   # Regression tests
+├── tests/                   # Representative tests for retained code slices
 ├── .github/workflows/       # Manual workflow pattern
-├── pyproject.toml
 └── README.md
 ```
 
@@ -203,8 +214,8 @@ outputs.
 ## Cloudflare And GitHub Actions Pattern
 
 The mirror includes a Cloudflare Worker trigger pattern under
-`cloudflare/ai-radar-trigger/` and a manual GitHub Actions workflow pattern
-under `.github/workflows/`.
+`cloudflare/ai-radar-trigger/` and a manual GitHub Actions static-check
+workflow under `.github/workflows/`.
 
 These files are included for architecture and safety review. They are not
 evidence that this public repository is deployed to Cloudflare or connected to
@@ -238,6 +249,8 @@ outside this public repository.
   schemas, and sanitized demos.
 - Keep private production runbooks, prompts, source configs, and state outside
   the public mirror.
+- Keep production-only implementation files out of the public showcase unless
+  they materially improve architecture review.
 - When updating docs, preserve the distinction between implemented, partial,
   planned, simulated, and private-production-only behavior.
 - When updating Cloudflare examples, keep defaults mirror-safe and avoid real

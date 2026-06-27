@@ -5,8 +5,8 @@
 - Status: active
 - Last Updated: 2026-06-19
 - Owner: project owner
-- Source of Truth: repository code, `README.md`, `.github/workflows/daily.yml`, tests
-- Related Files: `ai_radar_agent/__main__.py`, `collector.py`, `evidence_gate.py`, `event_history.py`, `llm.py`, `report_lint.py`, `brief.py`, `final_top_auditor.py`, `top_event_audit.py`, `feishu_docx.py`, `feishu_bot.py`
+- Source of Truth: README, workflow docs, schemas, evals, demo artifacts, and private production runtime files
+- Related Files: selected public code slices under `ai_radar_agent/`; full production runtime files are omitted from this curated mirror
 
 ## Workflow Overview
 
@@ -34,12 +34,12 @@ workflow_dispatch / CLI
 | --- | --- | --- | --- | --- | --- |
 | Trigger: `workflow_dispatch` / CLI | implemented | GitHub workflow inputs or CLI args | Parsed settings and requested date | GitHub run metadata when available | Input/date gate |
 | Beijing day window | implemented | Target date or blank date | `TimeWindow` for Asia/Shanghai natural day | Summary fields; date-specific output path | Time window gate |
-| RSS recall | implemented | `config/sources.yaml`, target window | RSS evidence items and RSS audit | `evidence.json`, `evidence.md` | Provider degradation gate; Evidence Gate |
+| RSS recall | implemented in private runtime | private source configuration, target window | RSS evidence items and RSS audit | `evidence.json`, `evidence.md` | Provider degradation gate; Evidence Gate |
 | Bocha recall | implemented | Query baskets, target window, configured key | Search evidence items and provider audit | `evidence.json`, `evidence.md` | Tool permission gate; provider degradation gate |
 | Tavily recall | implemented | Query baskets, target window, enabled flag, configured key | Optional search evidence items and provider audit | `evidence.json`, `evidence.md` | Cost gate; provider degradation gate |
 | Evidence dedupe and cap | implemented | Raw evidence list | Unique capped evidence list | `evidence.json` | Dedupe gate |
 | Evidence Gate + history | implemented | Raw evidence, source quality config, event history | Filtered/marked evidence and dropped evidence audit | `evidence_gate.json`, `evidence_dropped.md`, `event_history_matches.json`, `event_history_context.md` | Evidence Gate; history gate; privacy gate |
-| Report generation | implemented | `prompts/radar_prompt.md`, target window, filtered evidence context | Markdown radar report | `AI_radar_<date>.md` | Prompt source gate; source URL guardrail |
+| Report generation | implemented in private runtime | private prompt, target window, filtered evidence context | Markdown radar report | `AI_radar_<date>.md` | Prompt source gate; source URL guardrail |
 | Report source appendix | implemented | Report Markdown and evidence | Report with fallback source appendix when needed | `AI_radar_<date>.md` | Source URL guardrail |
 | `report_lint` | implemented | Report Markdown and evidence | Lint warnings/errors/critical errors | `report_lint.json` | report_lint gate |
 | Brief generation and repair | implemented | Report, audit, evidence catalog | Normalized brief data and brief Markdown | `brief.json`, `brief.md` | Brief schema/source_ids normalization gate |

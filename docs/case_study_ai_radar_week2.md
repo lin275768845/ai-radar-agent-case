@@ -120,8 +120,8 @@ The demo is not production execution, not live recall, not external model output
 | Runtime eval execution | planned | The checker validates definitions, not real runtime behavior. |
 | Phase D sanitized demo run | implemented | Demo artifacts are deterministic mock data. |
 | External publishing during Week 2 | intentionally disabled | No Feishu, webhook, workflow dispatch, or external publish action was triggered. |
-| Dashboard and screenshots | planned P2 / Week 7 Portfolio | Not part of Phase E. |
-| Phase F Obsidian-ready pattern notes | implemented | Repo-local export notes exist under [docs/obsidian_pattern_notes/AI_Radar_Week2_MOC.md](obsidian_pattern_notes/AI_Radar_Week2_MOC.md); they have not been imported into any vault. |
+| Dashboard and screenshots | planned P2 / Week 7 Portfolio | Not included in this curated public mirror. |
+| Obsidian-ready pattern notes | private/omitted | Pattern-note exports are not part of the curated public showcase. |
 
 ## 13. Lessons Learned
 
@@ -134,8 +134,8 @@ The demo is not production execution, not live recall, not external model output
 
 ## 14. Next Steps
 
-- Phase F: repo-local Obsidian-ready pattern notes are implemented; future use should keep human review before importing or promoting rules.
+- Pattern notes and private knowledge-base material remain outside this curated public showcase.
 - Future runtime work: emit RunManifest and ToolCall records from real runs.
 - Future eval work: validate emitted manifests and selected runtime outputs locally.
-- Week 7 Portfolio: create optional read-only dashboard/screenshots from sanitized artifacts.
+- Portfolio work: optional read-only dashboard/screenshots from sanitized artifacts.
 - Optional PR/review after explicit approval.

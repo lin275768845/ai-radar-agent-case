@@ -4,8 +4,10 @@
 - Agent Type: evidence-first intelligence and publishing agent
 - Status: active
 - Last Updated: 2026-06-19
-- Source of Truth: tests, `evals/`, runtime artifacts, report lint, brief normalization, Evidence Gate
-- Related Files: `evals/*.jsonl`, `tests/`, `report_lint.py`, `brief.py`, `evidence_gate.py`, `event_history.py`, `top_event_audit.py`, `feishu_bot.py`
+- Source of Truth: `evals/`, schemas, sanitized demo artifacts, selected tests,
+  and private production runtime artifacts.
+- Related Files: `evals/`, `schemas/`, `demo_run/`, selected `tests/`; full
+  production implementation files are omitted from this curated mirror.
 
 ## Eval Philosophy
 

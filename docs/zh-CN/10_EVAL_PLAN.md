@@ -5,7 +5,8 @@
 - 项目： AI Radar Agent
 - 代理类型： 证据优先的情报与发布代理
 - 状态： active
-- 事实来源： tests, `evals/`, runtime artifacts, report lint, brief normalization, Evidence Gate
+- 事实来源： `evals/`、schemas、sanitized demo artifacts、selected tests 和私有生产 runtime artifacts。
+- 公开镜像说明：完整 production implementation files 不包含在这个 curated mirror 中。
 
 ## 评估理念
 
