@@ -1,0 +1,504 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lin275768845/ai-radar-agent/schemas/run_manifest.schema.json",
+  "title": "AI Radar RunManifest Schema",
+  "description": "Phase B contract for a sanitized run-level evidence and execution manifest. This schema does not imply the current runtime emits run_manifest.json yet.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "run_id",
+    "execution_mode",
+    "started_at",
+    "status",
+    "safety_mode",
+    "input_summary",
+    "external_side_effects",
+    "redaction",
+    "contract_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "RunManifest contract version, for example 1.0."
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "GitHub run id, local uuid, or deterministic local run id."
+    },
+    "agent": {
+      "type": "string",
+      "const": "ai-radar-agent"
+    },
+    "run_type": {
+      "type": "string",
+      "enum": [
+        "local_cli",
+        "workflow_dispatch",
+        "scheduled",
+        "eval_static_check",
+        "demo_sanitized",
+        "unknown"
+      ]
+    },
+    "execution_mode": {
+      "type": "string",
+      "enum": [
+        "normal",
+        "dry_run",
+        "skip_llm",
+        "output_mode_none",
+        "eval_only",
+        "static_check",
+        "emergency_stop",
+        "no_publish",
+        "unknown"
+      ],
+      "description": "Mode used for runtime behavior or validation posture."
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "running",
+        "completed",
+        "completed_with_warnings",
+        "failed",
+        "blocked",
+        "skipped",
+        "cancelled"
+      ]
+    },
+    "safety_mode": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["dry_run", "skip_llm", "output_mode", "publish_allowed", "bot_send_allowed"],
+      "properties": {
+        "dry_run": {
+          "type": "boolean"
+        },
+        "skip_llm": {
+          "type": "boolean"
+        },
+        "output_mode": {
+          "type": "string",
+          "enum": ["default", "none", "report_only", "unknown"]
+        },
+        "eval_only": {
+          "type": "boolean",
+          "default": false
+        },
+        "static_check": {
+          "type": "boolean",
+          "default": false
+        },
+        "emergency_stop": {
+          "type": "boolean",
+          "default": false
+        },
+        "publish_allowed": {
+          "type": "boolean"
+        },
+        "bot_send_allowed": {
+          "type": "boolean"
+        },
+        "workflow_dispatch_allowed": {
+          "type": "boolean",
+          "default": false
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "input_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["target_date", "timezone"],
+      "properties": {
+        "target_date": {
+          "type": ["string", "null"],
+          "format": "date"
+        },
+        "timezone": {
+          "type": "string",
+          "default": "Asia/Shanghai"
+        },
+        "trigger": {
+          "type": "string",
+          "enum": ["cli", "workflow_dispatch", "schedule", "manual", "unknown"]
+        },
+        "ref_summary": {
+          "type": "string",
+          "description": "Branch/ref name if safe to record. Do not include credentials or signed URLs."
+        },
+        "provider_selection": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contains_raw_private_input": {
+          "type": "boolean",
+          "const": false
+        }
+      }
+    },
+    "source_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "provider_counts": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "integer",
+            "minimum": 0
+          }
+        },
+        "provider_status": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/providerStatus"
+          }
+        },
+        "window_start": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "window_end": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        }
+      }
+    },
+    "evidence_summary": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "raw_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "deduped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "accepted_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "dropped_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "official_source_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "low_quality_source_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "out_of_window_count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "history_match_count": {
+          "type": "integer",
+          "minimum": 0
+        }
+      }
+    },
+    "evidence_items": {
+      "type": "array",
+      "description": "Optional compact evidence references. Do not include raw private logs, secrets, or full scraped payloads.",
+      "items": {
+        "$ref": "#/$defs/evidenceItem"
+      }
+    },
+    "tool_calls": {
+      "type": "array",
+      "items": {
+        "$ref": "tool_call.schema.json"
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/gateResult"
+      }
+    },
+    "artifacts": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifactRef"
+      }
+    },
+    "publish_decision": {
+      "$ref": "#/$defs/publishDecision"
+    },
+    "publish_summary": {
+      "$ref": "#/$defs/publishDecision"
+    },
+    "external_side_effects": {
+      "type": "array",
+      "description": "Every external write/send/dispatch/delete decision, including skipped or blocked attempts.",
+      "items": {
+        "$ref": "#/$defs/externalSideEffect"
+      }
+    },
+    "errors": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/runMessage"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/runMessage"
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "additionalProperties": {
+        "type": ["number", "integer", "string", "boolean", "null"]
+      },
+      "description": "Safe aggregate metrics only. Do not store raw payloads or secrets."
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["applied", "raw_secrets_included", "raw_private_logs_included"],
+      "properties": {
+        "applied": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string"
+        },
+        "raw_secrets_included": {
+          "type": "boolean",
+          "const": false
+        },
+        "raw_private_logs_included": {
+          "type": "boolean",
+          "const": false
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    },
+    "contract_status": {
+      "type": "string",
+      "enum": [
+        "implemented_schema",
+        "partial_runtime",
+        "planned_runtime"
+      ],
+      "description": "Use implemented_schema for this Phase B schema contract; runtime emission remains separate."
+    },
+    "implementation_status": {
+      "type": "string",
+      "enum": [
+        "schema_only",
+        "runtime_partial",
+        "runtime_implemented"
+      ]
+    }
+  },
+  "$defs": {
+    "providerStatus": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["provider", "status"],
+      "properties": {
+        "provider": {
+          "type": "string",
+          "enum": ["rss", "bocha", "tavily", "llm", "feishu", "github_actions", "other"]
+        },
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed", "skipped", "blocked", "degraded", "not_configured"]
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "message_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "evidenceItem": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["evidence_id", "source_type", "url_status"],
+      "properties": {
+        "evidence_id": {
+          "type": "string"
+        },
+        "source_type": {
+          "type": "string",
+          "enum": ["official", "primary", "media", "aggregator", "social", "unknown"]
+        },
+        "url_status": {
+          "type": "string",
+          "enum": ["bound_to_source", "missing", "redacted", "not_applicable"]
+        },
+        "title_summary": {
+          "type": "string"
+        },
+        "published_at": {
+          "type": ["string", "null"],
+          "format": "date-time"
+        },
+        "gate_status": {
+          "type": "string",
+          "enum": ["accepted", "dropped", "warned", "unknown"]
+        },
+        "drop_reasons": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    },
+    "gateResult": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": ["gate_id", "gate_name", "status", "blocking"],
+      "properties": {
+        "gate_id": {
+          "type": "string"
+        },
+        "gate_name": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["passed", "failed", "warned", "skipped", "blocked", "not_applicable"]
+        },
+        "blocking": {
+          "type": "boolean"
+        },
+        "artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "artifact_type", "path", "status"],
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        },
+        "artifact_type": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path or logical reference. Do not store signed URLs, tokens, or private local absolute paths."
+        },
+        "status": {
+          "type": "string",
+          "enum": ["created", "planned", "skipped", "missing", "redacted"]
+        },
+        "privacy_level": {
+          "type": "string",
+          "enum": ["public_safe", "internal", "private", "requires_redaction"]
+        }
+      }
+    },
+    "publishDecision": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "decision": {
+          "type": "string",
+          "enum": ["publish_allowed", "publish_skipped", "publish_blocked", "dry_run", "not_applicable"]
+        },
+        "reason": {
+          "type": "string"
+        },
+        "human_approval": {
+          "type": "string",
+          "enum": ["required", "external_trigger", "not_required_for_dry_run", "unknown"]
+        },
+        "canonical_url_status": {
+          "type": "string",
+          "enum": ["none", "present", "redacted", "not_applicable"]
+        }
+      }
+    },
+    "externalSideEffect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["side_effect_type", "allowed", "attempted", "status"],
+      "properties": {
+        "side_effect_type": {
+          "type": "string",
+          "enum": ["github_workflow_dispatch", "feishu_publish", "feishu_bot_send", "webhook_send", "external_delete", "provider_write", "other"]
+        },
+        "allowed": {
+          "type": "boolean"
+        },
+        "attempted": {
+          "type": "boolean"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["succeeded", "failed", "skipped", "blocked", "not_applicable"]
+        },
+        "gate_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "message_summary": {
+          "type": "string"
+        }
+      }
+    },
+    "runMessage": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["code", "message_summary"],
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message_summary": {
+          "type": "string",
+          "description": "Redacted summary only."
+        },
+        "artifact_refs": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

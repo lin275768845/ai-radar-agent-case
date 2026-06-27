@@ -1,0 +1,260 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lin275768845/ai-radar-agent/schemas/tool_call.schema.json",
+  "title": "AI Radar ToolCall Schema",
+  "description": "Phase B contract for sanitized per-tool call metadata. This schema is a documentation/runtime contract and does not imply the current runtime emits ToolCall records yet.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "tool_call_id",
+    "run_id",
+    "tool_name",
+    "tool_category",
+    "permission_class",
+    "purpose",
+    "status",
+    "network_access",
+    "external_side_effect",
+    "dry_run",
+    "sensitive_data_policy"
+  ],
+  "properties": {
+    "schema_version": {
+      "type": "string",
+      "description": "ToolCall contract version, for example 1.0."
+    },
+    "tool_call_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Stable id unique within a run."
+    },
+    "run_id": {
+      "type": "string",
+      "minLength": 1,
+      "description": "RunManifest run id that owns this call."
+    },
+    "tool_name": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Concrete tool or subsystem name, such as rss_fetch, bocha_search, report_llm, feishu_docx, or pytest."
+    },
+    "tool_category": {
+      "type": "string",
+      "enum": [
+        "rss",
+        "bocha",
+        "tavily",
+        "llm",
+        "filesystem_artifact",
+        "github_actions",
+        "feishu",
+        "pytest",
+        "eval_checker",
+        "other"
+      ]
+    },
+    "permission_class": {
+      "type": "string",
+      "enum": [
+        "read_only",
+        "local_write",
+        "dry_run_only",
+        "external_side_effect",
+        "forbidden",
+        "planned"
+      ],
+      "description": "Permission class aligned with docs/06_TOOLS_AND_PERMISSIONS.md."
+    },
+    "purpose": {
+      "type": "string",
+      "minLength": 1,
+      "description": "Why the tool was requested, without raw prompts, credentials, payloads, or private logs."
+    },
+    "started_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "finished_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "planned",
+        "started",
+        "succeeded",
+        "failed",
+        "skipped",
+        "blocked",
+        "degraded",
+        "timed_out"
+      ],
+      "description": "Supports blocked, skipped, and degraded calls, not only successful calls."
+    },
+    "latency_ms": {
+      "type": ["integer", "null"],
+      "minimum": 0
+    },
+    "retry_count": {
+      "type": "integer",
+      "minimum": 0,
+      "default": 0
+    },
+    "input_summary": {
+      "$ref": "#/$defs/redactedSummary"
+    },
+    "output_summary": {
+      "$ref": "#/$defs/redactedSummary"
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Evidence ids or compact references. Do not inline full evidence payloads."
+    },
+    "artifact_refs": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/artifactRef"
+      }
+    },
+    "gate_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Gate ids or names that authorized, blocked, or reviewed this call."
+    },
+    "network_access": {
+      "type": "string",
+      "enum": [
+        "none",
+        "public_read",
+        "provider_api",
+        "github_actions",
+        "feishu_api",
+        "webhook",
+        "unknown"
+      ]
+    },
+    "external_side_effect": {
+      "type": "boolean",
+      "description": "True for publish, send, workflow dispatch, external delete, or other non-local writes."
+    },
+    "dry_run": {
+      "type": "boolean",
+      "description": "True when a call was blocked, simulated, or constrained by dry-run/no-publish controls."
+    },
+    "sensitive_data_policy": {
+      "type": "string",
+      "enum": [
+        "redacted_summary_only",
+        "no_sensitive_input",
+        "contains_public_urls_only",
+        "blocked_due_to_sensitive_data",
+        "unknown"
+      ],
+      "description": "Raw secrets, tokens, webhooks, cookies, credentials, private logs, and private notes must never be stored here."
+    },
+    "redaction": {
+      "$ref": "#/$defs/redaction"
+    },
+    "error": {
+      "type": ["object", "null"],
+      "additionalProperties": false,
+      "properties": {
+        "code": {
+          "type": "string"
+        },
+        "message_summary": {
+          "type": "string",
+          "description": "Redacted error summary. Do not include secrets, raw HTTP payloads, webhook URLs, or private log text."
+        },
+        "retryable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "contract_status": {
+      "type": "string",
+      "enum": [
+        "implemented_schema",
+        "partial_runtime",
+        "planned_runtime"
+      ],
+      "description": "Schema status for this record type. Runtime emission is not implied by this schema."
+    }
+  },
+  "$defs": {
+    "redactedSummary": {
+      "type": ["object", "null"],
+      "additionalProperties": true,
+      "properties": {
+        "summary": {
+          "type": "string"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "sample_ids": {
+          "type": "array",
+          "items": {
+            "type": "string"
+          }
+        },
+        "contains_raw_payload": {
+          "type": "boolean",
+          "const": false
+        },
+        "redacted": {
+          "type": "boolean"
+        }
+      }
+    },
+    "artifactRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["artifact_id", "path", "artifact_type"],
+      "properties": {
+        "artifact_id": {
+          "type": "string"
+        },
+        "path": {
+          "type": "string",
+          "description": "Relative path or logical artifact reference. Do not include signed URLs or secrets."
+        },
+        "artifact_type": {
+          "type": "string"
+        },
+        "privacy_level": {
+          "type": "string",
+          "enum": [
+            "public_safe",
+            "internal",
+            "private",
+            "requires_redaction"
+          ]
+        }
+      }
+    },
+    "redaction": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "applied": {
+          "type": "boolean"
+        },
+        "method": {
+          "type": "string"
+        },
+        "notes": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

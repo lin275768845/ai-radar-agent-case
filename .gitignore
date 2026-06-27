@@ -1,0 +1,57 @@
+.DS_Store
+__pycache__/
+*.py[cod]
+.env
+outputs/
+.venv/
+venv/
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+dist/
+build/
+coverage.xml
+htmlcov/
+__MACOSX/
+
+# Environment / secrets
+.env.*
+*.pem
+*.key
+*.crt
+secrets/
+credentials/
+tokens/
+
+# Local state / memory / logs
+state/*
+state/event_history.jsonl
+!state/.gitkeep
+!state/event_history.sample.jsonl
+runs/*
+!runs/.gitkeep
+logs/
+*.log
+
+# Local databases / private data
+data/private/
+private/
+*.sqlite
+*.sqlite3
+*.db
+*.duckdb
+
+# Node
+node_modules/
+.next/
+coverage/
+.wrangler/
+
+# OS / IDE
+.vscode/
+.idea/
+
+# Generated artifacts
+tmp/
+.cache/

@@ -1,0 +1,38 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/lin275768845/ai-radar-agent/schemas/input.schema.json",
+  "title": "AI Radar Agent Input Schema",
+  "description": "Scaffold only. This draft schema is not wired into the current runtime; current validation lives in Python code and tests.",
+  "type": "object",
+  "additionalProperties": true,
+  "properties": {
+    "target_date": {
+      "type": "string",
+      "format": "date",
+      "description": "Beijing natural-day target date."
+    },
+    "timezone": {
+      "type": "string",
+      "default": "Asia/Shanghai"
+    },
+    "dry_run": {
+      "type": "boolean",
+      "description": "When true, generate local artifacts without publishing."
+    },
+    "skip_llm": {
+      "type": "boolean",
+      "description": "When true, collect evidence without calling the LLM."
+    },
+    "replay_path": {
+      "type": "string",
+      "description": "Optional local evidence JSON path for replay/debug runs."
+    },
+    "search_providers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "description": "Provider names such as rss, bocha, and tavily."
+    }
+  }
+}
