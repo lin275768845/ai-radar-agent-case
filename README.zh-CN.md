@@ -12,13 +12,13 @@
 
 - 架构审阅。
 - 工作流审阅。
-- evidence-first intelligence agent 设计审阅。
+- 证据优先的情报 Agent 设计审阅。
 - 安全与自治边界审阅。
-- eval、schema、demo 审阅。
+- 评估用例、schema 契约和 demo artifacts 审阅。
 - 案例研究和作品集展示。
 
 它不是完整生产 clone，也不连接真实 Cloudflare、Feishu 或 GitHub
-生产部署。私有生产仓库仍然独立保留。
+Actions 生产运行配置。私有生产仓库仍然独立保留。
 
 生产 secrets、私有配置、真实生产 outputs、真实 Feishu 发布历史、
 私有 runtime state，以及生产 `state/event_history.jsonl` 都被有意排除。
@@ -29,7 +29,7 @@
 ## 这个镜像是什么
 
 - 基于真实生产 agent 的脱敏作品集镜像。
-- 用于展示 evidence-first intelligence agent 的架构与方法论。
+- 用于展示证据优先的情报 Agent 架构与方法论。
 - 用于审阅 workflow、gates、autonomy boundaries、schema contracts、
   evals、demo artifacts 和 public safety posture。
 - 展示系统结构，但不暴露 credentials、private runtime state 或生产发布历史。
@@ -121,7 +121,7 @@ AI Radar Agent 是一个证据优先的情报与发布代理。它收集公开 A
 | Runtime eval integration | 计划中 | Checker 校验定义，不校验真实 runtime behavior。 |
 | Sanitized demo run | 已实现 | Demo artifacts 使用确定性 mock data，并明确标记为 simulated。 |
 | 中文文档 | 已实现 | 中文镜像文档位于 `README.zh-CN.md` 和 `docs/zh-CN/`。 |
-| External publish | 私有且人工门禁 | 真实发布控制属于私有生产环境。 |
+| External publish | 私有生产环境控制（human-gated） | 真实发布能力不属于公开镜像的可运行范围。 |
 | Dashboard/screenshots | 计划中 | 不属于本次 mirror polish。 |
 
 ## 工作流草图
