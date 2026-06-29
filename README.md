@@ -2,6 +2,26 @@
 
 Chinese mirror: [README.zh-CN.md](README.zh-CN.md).
 
+## At a glance
+
+AI Radar Agent is an evidence-first intelligence agent for tracking AI
+industry signals. It collects public signals such as model releases, agent
+products, enterprise adoption, infrastructure changes, policy developments,
+and funding events; then filters them through source-quality checks, reporting
+windows, recent-history deduplication, and an Evidence Gate before generating a
+source-bound daily radar report.
+
+Its value is not simply "writing a daily newsletter automatically." The system
+separates evidence collection, evidence gating, LLM-based synthesis, report
+linting, top-event auditing, publish gating, and human-owned external actions.
+The LLM is used to summarize, structure, rank, and explain evidence-bound
+signals, but it is not treated as the source of truth.
+
+In short, this mirror shows how a real AI information workflow can be
+standardized into an auditable intelligence Agent: one that can explain why an
+event was selected, trace the evidence behind it, evaluate output quality, and
+control when publishing is allowed.
+
 ## Public Case-Study Mirror
 
 This repository is a sanitized public mirror of a production AI Radar Agent.
