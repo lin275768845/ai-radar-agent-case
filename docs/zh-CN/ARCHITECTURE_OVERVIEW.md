@@ -46,20 +46,21 @@ production state 都属于私有生产环境边界。
 
 ```mermaid
 sequenceDiagram
-  participant CF as Cloudflare cron or manual trigger
-  participant GH as GitHub workflow_dispatch
-  participant WF as AI Radar workflow
-  participant ART as Local artifacts
-  participant PUB as Private production publish path
+  participant CF as CloudflareTrigger
+  participant GH as GitHubActions
+  participant WF as AIRadarWorkflow
+  participant ART as LocalArtifacts
+  participant PUB as PrivatePublishPath
 
-  CF->>GH: dispatch main workflow
-  Note over CF,GH: Public mirror only shows the pattern; no live secrets included
-  GH->>WF: inputs dry_run, skip_llm, send_bot
-  GH->>WF: inputs output_mode, bocha_enabled, tavily_enabled
-  WF->>WF: recall, Evidence Gate, report lint, final top reconciliation
+  CF->>GH: workflow_dispatch on main
+  CF-->>GH: review pattern only, no live secrets
+  GH->>WF: dry_run, skip_llm, send_bot
+  GH->>WF: output_mode, bocha_enabled, tavily_enabled
+  WF->>WF: recall and Evidence Gate
+  WF->>WF: report lint and final top reconciliation
   WF->>ART: write review artifacts
   alt Publish Gate blocks
-    WF-->>ART: publish skipped or dry-run result
+    WF-->>ART: publish skipped or dry run result
   else Private production allows publish
     WF-->>PUB: Feishu doc or bot path outside public mirror
   end
