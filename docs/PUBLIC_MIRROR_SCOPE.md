@@ -6,6 +6,9 @@ Agent.
 It is intended for portfolio and case-study review. It is not intended to
 reproduce the private production deployment end to end.
 
+For visual workflow and boundary diagrams, see
+[docs/ARCHITECTURE_OVERVIEW.md](ARCHITECTURE_OVERVIEW.md).
+
 ## Purpose
 
 - Review the evidence-first intelligence-agent architecture.

@@ -26,6 +26,9 @@ Actions 生产运行配置。私有生产仓库仍然独立保留。
 更多范围说明见
 [docs/zh-CN/PUBLIC_MIRROR_SCOPE.md](docs/zh-CN/PUBLIC_MIRROR_SCOPE.md)。
 
+可视化架构说明：
+[docs/zh-CN/ARCHITECTURE_OVERVIEW.md](docs/zh-CN/ARCHITECTURE_OVERVIEW.md)。
+
 ## 这个镜像是什么
 
 - 基于真实生产 agent 的脱敏作品集镜像。

@@ -4,6 +4,9 @@
 
 它用于作品集展示和案例研究审阅，不用于端到端复现私有生产部署。
 
+可视化 workflow 与 boundary diagrams 见
+[docs/zh-CN/ARCHITECTURE_OVERVIEW.md](ARCHITECTURE_OVERVIEW.md)。
+
 ## 目的
 
 - 审阅 evidence-first intelligence agent 的架构。

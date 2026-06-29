@@ -20,6 +20,9 @@ publication history, private runtime state, and production
 For the concise scope statement, see
 [docs/PUBLIC_MIRROR_SCOPE.md](docs/PUBLIC_MIRROR_SCOPE.md).
 
+Visual architecture guide:
+[docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md).
+
 ## What This Mirror Is
 
 - A sanitized portfolio mirror based on a real production AI intelligence
