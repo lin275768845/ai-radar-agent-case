@@ -2,37 +2,39 @@
 
 Chinese mirror: [README.zh-CN.md](README.zh-CN.md).
 
-## At a glance
+## Executive Summary: More Than a Daily Report Script
 
-AI Radar Agent is an evidence-first intelligence agent for tracking AI
-industry signals. It collects public signals such as model releases, agent
-products, enterprise adoption, infrastructure changes, policy developments,
-and funding events; then filters them through source-quality checks, reporting
-windows, recent-history deduplication, and an Evidence Gate before generating a
-source-bound daily radar report.
+AI Radar Agent is not primarily a daily-newsletter generator. Its purpose is to
+turn noisy, fast-moving, fragmented AI industry signals into source-bound,
+auditable, publishable daily intelligence. The project must answer a harder
+set of questions than "can an LLM write a report": which sources should be
+trusted, how source quality should be controlled, what counts as a current
+signal, how recent-history duplicates should be removed, how every claim stays
+bound to evidence, and when publishing should be blocked.
 
-Its value is not simply "writing a daily newsletter automatically." The system
-separates evidence collection, evidence gating, LLM-based synthesis, report
-linting, top-event auditing, publish gating, and human-owned external actions.
+The hard part is the control system around the LLM. The workflow separates
+source recall, source-quality checks, reporting windows, recent-history
+deduplication, evidence binding, final ranking, report audits, publish gating,
+and human-owned external actions. The LLM is used for synthesis, structure,
+ranking, and explanation after evidence has been collected and filtered. It is
+not treated as the source of truth, does not collect sources, does not own the
+main deduplication logic, and cannot decide whether publishing is allowed.
 
-The LLM participates in three bounded parts of the workflow:
+AI Radar solves this with a staged workflow: RSS and optional Bocha recall
+public signals; time-window checks, source-quality controls, recent-history
+checks, and the Evidence Gate decide what can enter the narrative; report
+generation and brief/card generation operate on evidence-bound inputs;
+`report_lint`, `top_event_audit`, final-top reconciliation, and the Publish
+Gate review the result before any private production Feishu or bot path is
+allowed. The system is designed to reduce stale news, weak sources, duplicate
+events, hallucinated claims, and accidental publishing.
 
-- Report generation: turning accepted, source-bound evidence into the daily
-  radar report.
-- Brief/card generation and repair: producing structured brief content and
-  resolving it back to the evidence catalog when possible.
-- Optional final-top audit: reviewing final top candidates against recent
-  history for high-confidence duplicate signals after deterministic dedupe.
-
-The LLM is used to summarize, structure, rank, and explain evidence-bound
-signals. It is not treated as the source of truth, does not collect sources,
-does not own the main deduplication logic, and cannot decide whether publishing
-is allowed.
-
-In short, this mirror shows how a real AI information workflow can be
-standardized into an auditable intelligence Agent: one that can explain why an
-event was selected, trace the evidence behind it, evaluate output quality, and
-control when publishing is allowed.
+This sanitized public mirror demonstrates the reusable methods extracted from
+the production Agent: evidence-first workflow design, source-quality strategy,
+recency and dedupe controls, publish gate design, autonomy boundaries,
+no-side-effect evals, `RunManifest` / `ToolCall` contract thinking, and a
+repeatable methodology for turning a private production project into a safe
+public portfolio case.
 
 ## Public Case-Study Mirror
 
