@@ -2,148 +2,141 @@
 
 ## 目的
 
-这份面板总结 AI Radar Agent 脱敏公开镜像背后的高层运行原则。
+这份面板说明 AI Radar Agent 的高层工作原则：它如何筛选信号、控制消息源质量、
+处理时间窗口和去重、使用证据门禁（Evidence Gate）与发布门禁（Publish Gate），
+以及哪些动作必须保留人工控制。
 
-它面向作品集和架构审阅者，帮助对方先理解这个 Agent 如何做判断，再进入
-工程细节。它不是完整私有生产 runbook，也不表示这个 public mirror 可以直接
-跑生产流水线。
+它面向作品集和架构审阅者，不是私有生产运行手册，也不表示公开镜像可以直接运行生产流水线。
 
 ## 策略总览
 
-| 领域 | 原则 |
+| 领域 | 工作原则 |
 | --- | --- |
 | 使命 | 把公开 AI 信号转成有来源约束的情报。 |
-| 证据 | Evidence before narrative。 |
-| 消息源质量 | 优先使用官方和权威来源；低置信信号需要降级或标记。 |
-| 时效性 | 使用北京时间自然日窗口，并结合 recent-history checks。 |
-| 去重 | 通过 event history 和 final-top dedupe 避免重复推高近期已覆盖事件。 |
-| 排名 | 优先考虑高影响的模型、平台、Agent、采用、政策和基础设施信号。 |
-| 发布 | 只有在 lint/audit 和 Publish Gate 通过后才进入发布路径。 |
-| 人工控制 | 外部副作用仍然由人拥有最终控制权。 |
-| 公开镜像边界 | 用于审阅 architecture 和 safety，不从这个 mirror 跑生产。 |
+| 证据 | 先证据，后叙事。 |
+| 消息源质量 | 优先使用官方和权威来源；低置信信号只能降级、标记或作为观察线索。 |
+| 时效性 | 采用北京时间自然日窗口，并结合近期历史记录检查。 |
+| 去重 | 通过 event history 和最终 Top 去重，避免近期已覆盖事件被重复推高。 |
+| 排名 | 优先处理高影响的模型、平台、Agent、采用、政策和基础设施信号。 |
+| 发布 | 只有在审计和发布门禁通过后，生产环境才进入发布路径。 |
+| 人工控制 | 外部副作用由人保留最终控制权。 |
+| 公开镜像边界 | 用于架构和安全审阅，不从公开镜像运行生产。 |
 
 ## 1. 使命
 
-AI Radar Agent 的工作是：
+AI Radar Agent 的任务不是“每天写一篇报告”，而是把公开 AI 行业信号变成可审阅、
+可追溯、受门禁约束的情报产物。
 
-- 收集公开 AI 行业信号
-- 把 claims 绑定到 sources
-- 通过 evidence 和 quality gates 过滤候选事件
-- 生成带来源约束的每日情报报告
-- 只通过私有、受门禁控制的生产路径发布
+它的基本流程是：
 
-公开镜像展示的是系统形状，不暴露私有 source configuration、prompts、
-production state 或发布历史。
+- 收集公开 AI 行业信号。
+- 将关键主张绑定到来源。
+- 通过证据质量、时间窗口、去重和相关性检查筛选候选事件。
+- 生成带来源约束的每日情报报告。
+- 只有在私有生产环境的发布门禁允许时，才进入外部发布路径。
+
+公开镜像展示系统形状，不暴露私有消息源配置、prompts、生产状态或发布历史。
 
 ## 2. 信号召回策略
 
-RSS 是基础的公开来源召回路径。
+RSS 是基础召回路径，用来覆盖稳定的公开消息源。
 
-Bocha 是显式可选的搜索扩展，由 `bocha_enabled` 控制。Tavily 也是可选
-扩展，只有在相关运行配置明确启用时才进入召回。
+Bocha 是显式可选的搜索扩展，由 `bocha_enabled` 控制。Tavily 也是可选扩展，
+只有在运行配置明确启用时才参与召回。
 
-LLM 用于综合和写作，不是事实来源。Source configuration 和 report prompts
-属于私有生产资产，已经从公开镜像中排除。
+LLM 用于综合、表达和结构化，不是事实来源。消息源配置和报告 prompts 属于私有生产资产，
+已经从公开镜像中排除。
 
 ## 3. 消息源质量策略
 
-如果官方来源可用，它通常是最高置信来源。
+官方来源可用时，优先作为最高置信依据。
 
-权威媒体可以支持分析，特别是在官方来源不可用，或需要理解采用、市场和
-行业背景时。低置信来源更适合作为观察信号、弱上下文或待验证候选，而不是
-直接写成强结论。
+权威媒体可以补充行业背景、采用情况和市场语境，但不应覆盖一手来源。
+低置信来源更适合作为观察信号、弱上下文或待验证候选，不应直接写成强结论。
 
-仓库文档使用 source tier、`source_fit` 等 source-quality 概念。这里把它们
-保守地描述为消息源质量信号，而不是公开私有生产策略的完整定义。
+仓库文档中出现的 source tier、`source_fit` 等概念，应理解为消息源质量信号。
+公开镜像不会展开私有生产策略的完整细节。
 
-Source URL 和 evidence binding 很重要。证据不完整或相互冲突时，应该显式
-表达不确定性，而不是写成过度确定的叙事。
+来源链接和证据绑定是关键。证据不完整、相互冲突或置信度不足时，报告应明确表达不确定性。
 
 ## 4. 时间窗口与去重策略
 
 报告窗口采用北京时间自然日。
 
-时效性控制依赖 event history、recent-history checks 和 final-top dedupe。
-重复事件或后续报道不应自动重新进入 Top，除非它们带来实质新增信息。
+时效性控制依赖 event history、近期历史记录检查和最终 Top 去重。重复事件或后续报道不应自动进入 Top，
+除非它们带来实质新增信息。
 
-公开镜像说明了 recent-history 行为，但不暴露完整私有生产配置。因此这里使用
-"recent-history window"，不声明固定天数。
+公开镜像说明了近期历史去重行为，但不公开完整私有生产配置。因此这里使用“近期历史窗口”，
+不声明固定天数。
 
 ## 5. 证据门禁策略
 
-候选 evidence 需要通过 source、date-window、quality 和 relevance checks，
-才可以进入报告叙事。
+候选证据需要通过消息源、时间窗口、质量和相关性检查，才可以进入报告叙事。
 
-Evidence Gate 把 recall 和 narrative generation 分开。被丢弃或降级的条目
-在有 artifact 的地方应保持可审计；通过门禁的 evidence 才进入候选表、
-report synthesis、brief generation 和 final-top decisions。
+证据门禁把“召回到的信号”和“可以写进报告的内容”分开。被丢弃或降级的条目，
+在有产物记录的地方应保持可审计；通过门禁的证据才进入候选表、报告生成、brief 生成和最终 Top 决策。
 
-Week 2 的一个具体修复教训是：final selections 应该更新 evidence-bound
-candidate rows，而不是追加 synthetic `final_top` rows。这样才能保持从
-source evidence 到 final selection 的审阅链路。
+Week 2 的一个具体修复教训是：最终选择应该更新已有的 evidence-bound candidate rows，
+而不是追加 synthetic `final_top` rows。这样才能保持从来源证据到最终选择的审阅链路。
 
 ## 6. 排名与最终 Top 策略
 
-最终 Top 应优先考虑：
+最终 Top 优先考虑：
 
-- 影响强度
-- 确定性
-- 来源质量
-- 时效性
-- 与 AI 能力、产品、基础设施、治理、采用和 Agent/workflow 变化的相关性
+- 影响强度。
+- 事实确定性。
+- 消息源质量。
+- 时效性。
+- 与 AI 能力、产品、基础设施、治理、采用和 Agent/workflow 变化的相关性。
 
-最终 Top 必须保持 source-bound。证据较弱时，Agent 不应过度断言，而应降级、
-标记，或保留为观察信号。
+最终 Top 必须保持来源绑定。证据较弱时，Agent 应降级、标记，或保留为观察信号，
+而不是写成过度确定的判断。
 
 ## 7. 发布策略
 
-Publish Gate 与 Evidence Gate 是两个不同的边界。
+发布门禁和证据门禁是两个不同边界。
 
-Evidence Gate 判断一个条目是否有资格进入叙事。Publish Gate 判断一次运行
-是否允许产生外部副作用。
+证据门禁判断一个条目是否有资格进入叙事。发布门禁判断一次运行是否允许产生外部副作用。
 
-No-publish 模式包括 `dry_run`、`output_mode=none` 和 `send_bot=false`。
-Feishu 文档发布和 bot send 属于私有生产副作用，不属于 public mirror 行为。
+不发布验证模式包括 `dry_run`、`output_mode=none` 和 `send_bot=false`。
+Feishu 文档发布和 bot 发送属于私有生产副作用，不属于公开镜像行为。
 
-`report_lint` 和 `top_event_audit` 应根据 policy 在发布前 warn、block 或
-要求 review。`force_republish` 是显式的人类拥有动作，不应被视为默认自动化路径。
+`report_lint` 和 `top_event_audit` 应根据策略在发布前给出 warning、block 或人工复核要求。
+`force_republish` 是显式的人类动作，不应被当作默认自动化路径。
 
 ## 8. 人工控制边界
 
 以下动作仍然需要人工批准：
 
-- Cloudflare cutover
-- workflow dispatch
-- production publish
-- bot send
-- `force_republish`
-- provider enablement
-- 远端 artifacts 的删除或清理
+- Cloudflare cutover。
+- `workflow_dispatch`。
+- 生产发布。
+- bot 发送。
+- `force_republish`。
+- provider enablement。
+- 远端 artifacts 删除或清理。
 
-Agent 可以准备 evidence、生成 draft、运行检查并总结状态。外部承诺由人负责。
+Agent 可以准备证据、生成草稿、运行检查并总结状态。对外承诺和外部状态变更由人负责。
 
 ## 9. 失败与降级策略
 
-Provider failure 应该可见地降级，而不是静默编造。
+Provider failure 应可见地降级，而不是静默编造。
 
-RSS 普通缺页等失败应作为 warning，除非它们对本次运行构成 critical 风险。
+普通 RSS 缺页等失败应作为 warning，除非它们对本次运行构成 critical 风险。
 Bocha、Tavily 和 LLM 的可用性应在 artifacts、logs 或 summaries 中可见。
 
-如果 lint 或 audit 结果是 critical，publish 和 bot 路径应被阻断或进入人工
-review，再发生外部副作用。
+如果 lint 或 audit 结果是 critical，publish 和 bot 路径应被阻断，或进入人工复核后再发生外部副作用。
 
 ## 10. 这个 Agent 不做什么
 
 - 不把 LLM output 当作事实来源。
-- 不绕过 Publish Gate 发布。
-- 不在 public mirror 暴露 secrets。
-- 不把 public demo artifacts 说成 production outputs。
-- 不把仍处于 planned 或 partial 的 runtime `RunManifest` / `ToolCall`
-  emission 说成已完整实现。
-- 不把 public mirror 描述成完整私有生产 clone。
+- 不绕过发布门禁发布。
+- 不在公开镜像暴露 secrets。
+- 不把公开 demo artifacts 说成生产输出。
+- 不把仍处于计划中或部分实现状态的 runtime `RunManifest` / `ToolCall` emission 写成已完整实现。
+- 不把公开镜像描述成完整私有生产仓库。
 
 ## 11. 审阅者快速理解
 
-这个 Agent 不只是 daily-report script，因为它把 recall、Evidence Gate、
-synthesis、lint/audit、final-top reconciliation、Publish Gate 和人工拥有的
-external side effects 分离成可审阅的工作流。
+AI Radar Agent 不只是日报脚本。它把召回、证据门禁、综合写作、报告审计、最终 Top 对齐、
+发布门禁和人工控制的外部副作用拆成可审阅的工作流。
