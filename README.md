@@ -14,8 +14,20 @@ source-bound daily radar report.
 Its value is not simply "writing a daily newsletter automatically." The system
 separates evidence collection, evidence gating, LLM-based synthesis, report
 linting, top-event auditing, publish gating, and human-owned external actions.
+
+The LLM participates in three bounded parts of the workflow:
+
+- Report generation: turning accepted, source-bound evidence into the daily
+  radar report.
+- Brief/card generation and repair: producing structured brief content and
+  resolving it back to the evidence catalog when possible.
+- Optional final-top audit: reviewing final top candidates against recent
+  history for high-confidence duplicate signals after deterministic dedupe.
+
 The LLM is used to summarize, structure, rank, and explain evidence-bound
-signals, but it is not treated as the source of truth.
+signals. It is not treated as the source of truth, does not collect sources,
+does not own the main deduplication logic, and cannot decide whether publishing
+is allowed.
 
 In short, this mirror shows how a real AI information workflow can be
 standardized into an auditable intelligence Agent: one that can explain why an
