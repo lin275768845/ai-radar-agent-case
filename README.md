@@ -23,6 +23,9 @@ For the concise scope statement, see
 Visual architecture guide:
 [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md).
 
+Agent strategy panel:
+[docs/STRATEGY_PANEL.md](docs/STRATEGY_PANEL.md).
+
 ## What This Mirror Is
 
 - A sanitized portfolio mirror based on a real production AI intelligence
@@ -166,6 +169,8 @@ required to run the production path end to end.
 | Artifact | Purpose |
 | --- | --- |
 | [docs/PUBLIC_MIRROR_SCOPE.md](docs/PUBLIC_MIRROR_SCOPE.md) | Scope and runability boundary for this public mirror. |
+| [docs/STRATEGY_PANEL.md](docs/STRATEGY_PANEL.md) | High-level operating doctrine for signal selection, evidence gates, publish gates, and human control. |
+| [docs/ARCHITECTURE_OVERVIEW.md](docs/ARCHITECTURE_OVERVIEW.md) | Visual workflow, trigger, observability, and public/private boundary guide. |
 | [docs/03_WORKFLOW.md](docs/03_WORKFLOW.md) | Workflow stages from recall to artifacts and publish gate. |
 | [docs/04_AUTONOMY_MATRIX.md](docs/04_AUTONOMY_MATRIX.md) | Autonomy boundaries and human-approval points. |
 | [docs/06_TOOLS_AND_PERMISSIONS.md](docs/06_TOOLS_AND_PERMISSIONS.md) | Tool permission matrix and side-effect classes. |

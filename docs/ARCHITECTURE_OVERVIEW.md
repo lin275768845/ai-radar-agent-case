@@ -9,6 +9,9 @@ contracts, and public mirror boundary. They do not imply that this repository
 is connected to live Cloudflare, Feishu, provider, or production GitHub
 deployment settings.
 
+For operating principles and decision strategy, see
+[docs/STRATEGY_PANEL.md](STRATEGY_PANEL.md).
+
 ## 1. End-to-End Agent Workflow
 
 ```mermaid

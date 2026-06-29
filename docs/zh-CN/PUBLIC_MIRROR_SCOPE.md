@@ -7,6 +7,9 @@
 可视化 workflow 与 boundary diagrams 见
 [docs/zh-CN/ARCHITECTURE_OVERVIEW.md](ARCHITECTURE_OVERVIEW.md)。
 
+高层运行原则见
+[docs/zh-CN/STRATEGY_PANEL.md](STRATEGY_PANEL.md)。
+
 ## 目的
 
 - 审阅 evidence-first intelligence agent 的架构。

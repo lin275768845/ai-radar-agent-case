@@ -9,6 +9,9 @@ reproduce the private production deployment end to end.
 For visual workflow and boundary diagrams, see
 [docs/ARCHITECTURE_OVERVIEW.md](ARCHITECTURE_OVERVIEW.md).
 
+For high-level operating principles, see
+[docs/STRATEGY_PANEL.md](STRATEGY_PANEL.md).
+
 ## Purpose
 
 - Review the evidence-first intelligence-agent architecture.

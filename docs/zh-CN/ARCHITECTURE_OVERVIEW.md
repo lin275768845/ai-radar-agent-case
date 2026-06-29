@@ -8,6 +8,9 @@
 observability contracts 和 public mirror boundary。它们不表示本仓库连接了
 真实 Cloudflare、Feishu、provider 或 GitHub 生产运行配置。
 
+运行原则和决策策略见
+[docs/zh-CN/STRATEGY_PANEL.md](STRATEGY_PANEL.md)。
+
 ## 1. End-to-End Agent Workflow
 
 ```mermaid
